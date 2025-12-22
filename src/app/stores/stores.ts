@@ -2,6 +2,7 @@ import { configureStore } from '@reduxjs/toolkit';
 import authReducer from '@features/auth/redux/slices/auth.slice';
 import studentReducer from '@features/student/redux/slices/student.slice';
 import parentTeacherReducer from '@features/parent_teacher/redux/slices/parent_teacher.slice';
+import explorerReducer from '@features/explorer/redux/slices/explorer.slice';
 
 /**
  * Centralized Redux store
@@ -11,6 +12,7 @@ export const store = configureStore({
     auth: authReducer,
     student: studentReducer,
     parentTeacher: parentTeacherReducer,
+    explorer: explorerReducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({

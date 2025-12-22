@@ -29,6 +29,6 @@
       "@shared/*": ["src/shared/*"]
     }
   },
-  "include": ["src"],
+  "include": ["src", "src/features/auth/pages/t.tsx"],
   "references": [{ "path": "./tsconfig.node.json" }]
 }

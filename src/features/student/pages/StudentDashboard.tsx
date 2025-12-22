@@ -48,7 +48,7 @@ export const StudentDashboard = () => {
 
   const handleLogout = () => {
     dispatch(logout());
-    navigate('/login');
+    navigate('/');
   };
 
   return (
@@ -61,6 +61,37 @@ export const StudentDashboard = () => {
           <Typography variant="body1" sx={{ mr: 2 }}>
             {user?.firstName} {user?.lastName}
           </Typography>
+          <Button
+            color='inherit'
+            startIcon={<FlagIcon />}
+            onClick={() =>
+              navigate(`/student/explorer`)
+            }
+            sx={{ mr: 1 }}
+          >
+            Explorer
+          </Button>
+          <Button
+            color='inherit'
+            startIcon={<FlagIcon />}
+            onClick={() =>
+              navigate(`/student/explorer/testingPage`)
+            }
+            sx={{ mr: 1 }}
+          >
+            Testing Page
+          </Button>
+          <Button
+            color='inherit'
+            startIcon={<FlagIcon />}
+            onClick={() =>
+              navigate(`/student/welcome`)
+            }
+            sx={{ mr: 1 }}
+          >
+            game
+          </Button>
+
           <IconButton color="inherit" onClick={handleLogout}>
             <LogoutIcon />
           </IconButton>

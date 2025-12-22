@@ -1,6 +1,8 @@
 import { Routes, Route } from 'react-router-dom';
-import { SignInPage } from '@features/auth/pages/SignInPage';
+import { Parent_Teacher_SignInPage } from '@/features/auth/pages/Parent_Teacher_SignInPage';
 import { SignUpPage } from '@features/auth/pages/SignUpPage';
+import { WelcomePage } from '../pages/WelcomePage';
+import StudentSignInPage from '../pages/StudentSignInPage';
 
 /**
  * Auth feature routes
@@ -8,7 +10,9 @@ import { SignUpPage } from '@features/auth/pages/SignUpPage';
 export const AuthRoutes = () => {
   return (
     <Routes>
-      <Route path="/login" element={<SignInPage />} />
+      <Route path="/" element={<WelcomePage />} />
+      <Route path="/login/guardian" element={<Parent_Teacher_SignInPage />} />
+      <Route path="/login/student" element={<StudentSignInPage />} />
       <Route path="/signup" element={<SignUpPage />} />
     </Routes>
   );

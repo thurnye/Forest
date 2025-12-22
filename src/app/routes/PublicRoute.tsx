@@ -17,7 +17,7 @@ export const PublicRoute = () => {
       case UserRole.TEACHER:
         return <Navigate to="/parent-teacher" replace />;
       default:
-        return <Navigate to="/login" replace />;
+        return <Navigate to="/" replace />;
     }
   }
 

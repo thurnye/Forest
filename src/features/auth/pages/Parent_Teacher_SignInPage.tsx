@@ -26,7 +26,7 @@ const loginSchema = z.object({
 
 type LoginFormData = z.infer<typeof loginSchema>;
 
-export const SignInPage = () => {
+export const Parent_Teacher_SignInPage = () => {
   const dispatch = useAppDispatch();
   const { error, isLoading } = useAppSelector((state) => state.auth);
 
@@ -37,8 +37,8 @@ export const SignInPage = () => {
   } = useForm<LoginFormData>({
     resolver: zodResolver(loginSchema),
     defaultValues: {
-      email: 'student@test.com', //'testprogram404@gmail.com',
-      password: '123456' //'Password123!',
+      email: 'student@test.com', 
+      password: '123456' 
     },
   });
 

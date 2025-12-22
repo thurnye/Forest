@@ -31,7 +31,7 @@ export const ProtectedRoute = ({ allowedRoles }: ProtectedRouteProps) => {
 
   // Redirect to login if not authenticated
   if (!isAuthenticated || !user) {
-    return <Navigate to="/login" replace />;
+    return <Navigate to="/" replace />;
   }
 
   // Check role-based access
@@ -44,7 +44,7 @@ export const ProtectedRoute = ({ allowedRoles }: ProtectedRouteProps) => {
       case UserRole.TEACHER:
         return <Navigate to="/parent-teacher" replace />;
       default:
-        return <Navigate to="/login" replace />;
+        return <Navigate to="/" replace />;
     }
   }
 
