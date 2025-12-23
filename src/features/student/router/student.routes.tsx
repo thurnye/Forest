@@ -1,5 +1,4 @@
 import { Routes, Route } from 'react-router-dom';
-import { StudentDashboard } from '@features/student/pages/StudentDashboard';
 import { AssessmentPage } from '@features/student/pages/AssessmentPage';
 import { ExercisesListPage } from '@features/student/pages/ExercisesListPage';
 import { ExerciseDetailPage } from '@features/student/pages/ExerciseDetailPage';
@@ -14,7 +13,9 @@ import { MyPassportPage } from '@features/explorer/pages/MyPassportPage';
 import { AchievementPage } from '@features/explorer/pages/AchievementPage';
 import { JourneyMapPage } from '@features/explorer/pages/JourneyMapPage';
 import { PixiWelcomePage } from '@features/pixi-welcome/pages/PixiWelcomePage';
-import TestingPage from '@/features/explorer/pages/testingPage';
+import TestingPage from '@/features/student/pages/testingPage';
+import StudentDashboard from '../pages/StudentDashboard';
+// import { StudentDashboard_Old } from '../pages/StudentDashboard_Old';
 
 /**
  * Student feature routes

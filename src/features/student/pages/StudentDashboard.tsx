@@ -1,34 +1,62 @@
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import {
-  Container,
-  Box,
-  Typography,
-  Paper,
-  Grid,
-  Button,
-  Card,
-  CardContent,
-  CardActions,
-  AppBar,
-  Toolbar,
-  IconButton,
-  LinearProgress,
-  Chip,
-} from '@mui/material';
-import {
-  MenuBook as MenuBookIcon,
-  Assessment as AssessmentIcon,
-  TrendingUp as TrendingUpIcon,
-  Logout as LogoutIcon,
-  Flag as FlagIcon,
-} from '@mui/icons-material';
+import { Box, CardMedia, Typography } from '@mui/material';
+
+import welcome_plaque from '../../../assets/dashboard/dashboard_plaque.png';
+import loginBg from '../../../assets/dashboard/dasboardBg.png';
+import read_story from '../../../assets/dashboard/readStory.png';
+import achievement from '../../../assets/dashboard/archievement.png';
+import quest from '../../../assets/dashboard/quest.png';
+import board1 from '../../../assets/dashboard/board1.png';
+import level from '../../../assets/dashboard/level.png';
+import slate from '../../../assets/dashboard/slate.png';
 import { useAppDispatch, useAppSelector } from '@app/hooks/app.hooks';
 import { logout } from '@features/auth/redux/slices/auth.slice';
-import { fetchProgress, fetchGoals } from '@features/student/redux/slices/student.slice';
+import {
+  fetchProgress,
+  fetchGoals,
+} from '@features/student/redux/slices/student.slice';
 import { Student, UserRole } from '@shared/types/api.types';
 
-export const StudentDashboard = () => {
+const woodTextSx = {
+  position: 'absolute',
+  top: '50%',
+  left: '50%',
+  transform: 'translate(-50%, -50%)',
+  fontFamily: '"Comic Sans MS", cursive',
+  fontWeight: 800,
+  fontSize: { xs: '1.15rem', sm: '1.55rem' },
+  lineHeight: 1,
+  letterSpacing: '0.3px',
+  color: '#5a3a22',
+  textAlign: 'center',
+  textTransform: 'none',
+  WebkitTextStroke: '0.6px rgba(255,255,255,0.35)', // helps on textured boards
+  textShadow: `
+    0 2px 0 rgba(255,255,255,0.25),
+    0 3px 6px rgba(0,0,0,0.25)
+  `,
+  pointerEvents: 'none',
+  userSelect: 'none',
+  whiteSpace: 'nowrap',
+};
+
+const boardTextSx = {
+  position: 'absolute',
+  transform: 'translate(-50%, -50%)',
+  fontFamily: '"Comic Sans MS", cursive',
+  fontWeight: 900,
+  fontSize: { xs: '1.5rem', sm: '2rem' },
+  lineHeight: 1.3,
+  color: ' #EEDBA1',
+  textAlign: 'center',
+  WebkitTextStroke: '0.6px rgba(255,255,255,0.35)',
+  textShadow: `0 2px 0 rgba(255,255,255,0.25),0 3px 6px rgba(0,0,0,0.25)`,
+  pointerEvents: 'none',
+  userSelect: 'none',
+};
+
+export default function StudentDashboard() {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
   const { user } = useAppSelector((state) => state.auth);
@@ -37,7 +65,11 @@ export const StudentDashboard = () => {
 
   useEffect(() => {
     // Check if student needs to take diagnostic
-    if (student && student.diagnosticEnabled && !student.hasCompletedDiagnostic) {
+    if (
+      student &&
+      student.diagnosticEnabled &&
+      !student.hasCompletedDiagnostic
+    ) {
       navigate('/student/diagnostic/warmup');
       return;
     }
@@ -52,96 +84,136 @@ export const StudentDashboard = () => {
   };
 
   return (
-    <Box sx={{ flexGrow: 1 }}>
-      <AppBar position="static">
-        <Toolbar>
-          <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
-            Reading Forest - Student
+    <>
+      <Box
+        sx={{
+          minHeight: '100vh',
+          width: '100%',
+          position: 'relative',
+          overflow: 'hidden',
+          backgroundImage: `url(${loginBg})`,
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+        }}
+      >
+        <Box sx={{ position: 'relative' }}>
+          {/* welcome back plaque */}
+          <CardMedia
+            component='img'
+            image={welcome_plaque}
+            alt='welcome plaque'
+            sx={{
+              height: '100%',
+              width: '100%',
+              maxWidth: 800,
+              margin: { xs: 'auto', sm: 'auto' },
+            }}
+          />
+          <Typography
+            sx={{
+              ...boardTextSx,
+              top: '40%',
+              left: '45%',
+            }}
+          >
+            Hi {user?.firstName}! Welcome
+            <br />
+            <Box component='span'>back to Reading Forest</Box>
           </Typography>
-          <Typography variant="body1" sx={{ mr: 2 }}>
-            {user?.firstName} {user?.lastName}
-          </Typography>
-          <Button
-            color='inherit'
-            startIcon={<FlagIcon />}
-            onClick={() =>
-              navigate(`/student/explorer`)
-            }
-            sx={{ mr: 1 }}
-          >
-            Explorer
-          </Button>
-          <Button
-            color='inherit'
-            startIcon={<FlagIcon />}
-            onClick={() =>
-              navigate(`/student/explorer/testingPage`)
-            }
-            sx={{ mr: 1 }}
-          >
-            Testing Page
-          </Button>
-          <Button
-            color='inherit'
-            startIcon={<FlagIcon />}
-            onClick={() =>
-              navigate(`/student/welcome`)
-            }
-            sx={{ mr: 1 }}
-          >
-            game
-          </Button>
+        </Box>
 
-          <IconButton color="inherit" onClick={handleLogout}>
-            <LogoutIcon />
-          </IconButton>
-        </Toolbar>
-      </AppBar>
-
-      <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
-        <Typography variant="h4" gutterBottom>
-          Welcome, {user?.firstName}!
-        </Typography>
-
+        {/* LEVEL */}
         {progress && (
-          <Paper sx={{ p: 3, mb: 4 }}>
-            <Typography variant="h6" gutterBottom>
-              Your Progress
+          <Box sx={{ mt: 35, position: 'relative' }}>
+            <CardMedia
+              component='img'
+              image={level}
+              alt='welcome plaque'
+              sx={{
+                height: '100%',
+                width: '100%',
+                maxWidth: 700,
+              }}
+            />
+            <Typography
+              sx={{
+                ...boardTextSx,
+                top: '30%',
+                left: 220,
+              }}
+            >
+              {progress.currentLevel} Sapling
             </Typography>
-            <Grid container spacing={2}>
-              <Grid item xs={12} sm={4}>
-                <Typography variant="body2" color="text.secondary">
-                  Current Level
-                </Typography>
-                <Typography variant="h6">{progress.currentLevel}</Typography>
-              </Grid>
-              <Grid item xs={12} sm={4}>
-                <Typography variant="body2" color="text.secondary">
-                  Exercises Completed
-                </Typography>
-                <Typography variant="h6">
-                  {progress.exercisesCompleted} / {progress.totalExercises}
-                </Typography>
-              </Grid>
-              <Grid item xs={12} sm={4}>
-                <Typography variant="body2" color="text.secondary">
-                  Average Score
-                </Typography>
-                <Typography variant="h6">{progress.averageScore}%</Typography>
-              </Grid>
-            </Grid>
-          </Paper>
+
+            <Box>
+              <Typography
+                sx={{
+                  ...woodTextSx,
+                  top: '75%',
+                  left: 230,
+                }}
+              >
+                Exercise Complete{' '}
+                {`${progress.exercisesCompleted}/${progress.totalExercises}`}
+              </Typography>
+              {/* Average Scoe */}
+              <Typography
+                sx={{
+                  ...woodTextSx,
+                  top: '75%',
+                  left: 530,
+                  whiteSpace: 'nowrap',
+                }}
+              >
+                {progress.averageScore} stars earned
+              </Typography>
+            </Box>
+          </Box>
         )}
 
-        {goals.length > 0 && (
-          <Paper sx={{ p: 3, mb: 4 }}>
-            <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-              <FlagIcon sx={{ mr: 1, color: 'primary.main' }} />
-              <Typography variant="h6">Your Goals</Typography>
-            </Box>
-            <Grid container spacing={2}>
-              {goals.map((goal) => {
-                const progressPercentage = Math.round(
+        {/* QUEST ACCOMPLISHMENTS */}
+        <Box
+          sx={{
+            mt: 5,
+            ml: 15,
+          }}
+        >
+          <Box sx={{ position: 'relative' }}>
+            <CardMedia
+              component='img'
+              image={quest}
+              alt='welcome plaque'
+              sx={{
+                height: '100%',
+                width: '100%',
+                maxWidth: 1000,
+                // margin: { xs: 'auto', sm: 'auto' },
+              }}
+            />
+            <Typography
+              sx={{
+                ...boardTextSx,
+                top: '10%',
+                left: 240,
+              }}
+            >
+              Today's Forest Quest
+            </Typography>
+          </Box>
+          <Box
+            sx={{
+              mt: -21,
+              ml: 5,
+              display: 'flex',
+              flexDirection: 'row',
+              justifyContent: 'flex-start',
+              alignItems: 'center',
+            }}
+          >
+            {goals.length > 0 && (
+              <>
+                {goals.map((goal) => {
+                  const progressPercentage = Math.round(
                   (goal.currentValue / goal.targetValue) * 100
                 );
                 const isOverdue = new Date(goal.deadline) < new Date() && !goal.isCompleted;
@@ -149,146 +221,249 @@ export const StudentDashboard = () => {
                   (new Date(goal.deadline).getTime() - new Date().getTime()) /
                     (1000 * 60 * 60 * 24)
                 );
-
-                return (
-                  <Grid item xs={12} md={6} key={goal.id}>
-                    <Card
+                  return(
+                  <Box sx={{ position: 'relative' }}>
+                    <CardMedia
+                      component='img'
+                      image={board1}
+                      alt='welcome plaque'
                       sx={{
-                        border: goal.isCompleted ? '2px solid #4caf50' : 'none',
+                        height: '100%',
+                        width: 400,
+                        maxWidth: 700,
+                        // margin: { xs: 'auto', sm: 'auto' },
+                      }}
+                    />
+                    <Typography
+                      sx={{
+                        ...woodTextSx,
+                        top: '25%',
+                        left: 170,
+                        whiteSpace: 'wrap',
                       }}
                     >
-                      <CardContent>
-                        <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
-                          <Typography variant="h6" sx={{ fontSize: '1.1rem' }}>
-                            {goal.title}
-                          </Typography>
-                          {goal.isCompleted && (
-                            <Chip label="Completed" color="success" size="small" />
-                          )}
-                          {isOverdue && (
-                            <Chip label="Overdue" color="error" size="small" />
-                          )}
-                        </Box>
-                        <Typography variant="body2" color="text.secondary" paragraph>
-                          {goal.description}
-                        </Typography>
-
-                        <Box sx={{ mb: 2 }}>
-                          <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 0.5 }}>
-                            <Typography variant="caption" color="text.secondary">
-                              Progress: {goal.currentValue} / {goal.targetValue}{' '}
-                              {goal.unit === 'exercises'
-                                ? 'exercises'
-                                : goal.unit === 'score'
-                                ? '%'
-                                : 'minutes'}
-                            </Typography>
-                            <Typography variant="caption" color="text.secondary">
-                              {progressPercentage}%
-                            </Typography>
-                          </Box>
-                          <LinearProgress
-                            variant="determinate"
-                            value={Math.min(progressPercentage, 100)}
-                            sx={{ height: 8, borderRadius: 4 }}
-                            color={goal.isCompleted ? 'success' : 'primary'}
-                          />
-                        </Box>
-
-                        <Typography variant="caption" color="text.secondary">
-                          {goal.isCompleted
-                            ? 'Goal achieved! '
-                            : isOverdue
-                            ? 'Deadline passed'
-                            : daysLeft === 0
-                            ? 'Due today'
-                            : daysLeft === 1
-                            ? 'Due tomorrow'
-                            : `${daysLeft} days left`}
-                        </Typography>
-                      </CardContent>
-                    </Card>
-                  </Grid>
-                );
-              })}
-            </Grid>
-          </Paper>
-        )}
-
-        <Grid container spacing={3}>
-          <Grid item xs={12} md={4}>
-            <Card>
-              <CardContent>
-                <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-                  <AssessmentIcon sx={{ fontSize: 40, color: 'primary.main', mr: 1 }} />
-                  <Typography variant="h6">Take Assessment</Typography>
+                      {goal.title}
+                    </Typography>
+                    <Typography
+                      sx={{
+                        ...woodTextSx,
+                        top: '63%',
+                        left: 170,
+                        whiteSpace: 'nowrap',
+                      }}
+                    >
+                      {progressPercentage}% finished
+                    </Typography>
+                    <Typography
+                      sx={{
+                        ...woodTextSx,
+                        top: '80%',
+                        left: 170,
+                        whiteSpace: 'nowrap',
+                        fontSize: '0.9rem',
+                      }}
+                    >
+                      {goal.isCompleted
+                        ? 'Goal achieved! '
+                        : isOverdue
+                        ? 'Deadline passed'
+                        : daysLeft === 0
+                        ? 'Due today'
+                        : daysLeft === 1
+                        ? 'Due tomorrow'
+                        : `${daysLeft} days left`}
+                    </Typography>
+                  </Box>
+                )})}
+                {/* <Box sx={{ position: 'relative' }}>
+                  <CardMedia
+                    component='img'
+                    image={board1}
+                    alt='welcome plaque'
+                    sx={{
+                      height: '100%',
+                      width: 400,
+                      maxWidth: 700,
+                      // margin: { xs: 'auto', sm: 'auto' },
+                    }}
+                  />
+                  <Typography
+                    sx={{
+                      ...woodTextSx,
+                      top: '25%',
+                      left: 170,
+                      whiteSpace: 'nowrap',
+                    }}
+                  >
+                    Read 5 Stories
+                  </Typography>
+                  <Typography
+                    sx={{
+                      ...woodTextSx,
+                      top: '63%',
+                      left: 170,
+                      whiteSpace: 'nowrap',
+                    }}
+                  >
+                    1/5 finished
+                  </Typography>
+                  <Typography
+                    sx={{
+                      ...woodTextSx,
+                      top: '80%',
+                      left: 170,
+                      whiteSpace: 'nowrap',
+                      fontSize: '0.9rem',
+                    }}
+                  >
+                    7 days left
+                  </Typography>
                 </Box>
-                <Typography variant="body2" color="text.secondary">
-                  Find out your reading level with a quick assessment
-                </Typography>
-              </CardContent>
-              <CardActions>
-                <Button
-                  size="large"
-                  variant="contained"
-                  fullWidth
-                  onClick={() => navigate('/student/assessment')}
-                >
-                  Start Assessment
-                </Button>
-              </CardActions>
-            </Card>
-          </Grid>
+                <Box sx={{ position: 'relative' }}>
+                  <CardMedia
+                    component='img'
+                    image={board1}
+                    alt='welcome plaque'
+                    sx={{
+                      height: '100%',
+                      width: 400,
+                      maxWidth: 700,
+                      // margin: { xs: 'auto', sm: 'auto' },
+                    }}
+                  />
+                  <Typography
+                    sx={{
+                      ...woodTextSx,
+                      top: '25%',
+                      left: 170,
+                      whiteSpace: 'nowrap',
+                    }}
+                  >
+                    Earn 90 Stars
+                  </Typography>
+                  <Typography
+                    sx={{
+                      ...woodTextSx,
+                      top: '63%',
+                      left: 170,
+                      whiteSpace: 'nowrap',
+                    }}
+                  >
+                    85/90
+                  </Typography>
+                  <Typography
+                    sx={{
+                      ...woodTextSx,
+                      top: '80%',
+                      left: 170,
+                      whiteSpace: 'nowrap',
+                      fontSize: '0.9rem',
+                    }}
+                  >
+                    30 days left
+                  </Typography>
+                </Box> */}
+              </>
+            )}
+          </Box>
+        </Box>
 
-          <Grid item xs={12} md={4}>
-            <Card>
-              <CardContent>
-                <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-                  <MenuBookIcon sx={{ fontSize: 40, color: 'primary.main', mr: 1 }} />
-                  <Typography variant="h6">Practice Exercises</Typography>
-                </Box>
-                <Typography variant="body2" color="text.secondary">
-                  Work on reading exercises tailored to your level
-                </Typography>
-              </CardContent>
-              <CardActions>
-                <Button
-                  size="large"
-                  variant="contained"
-                  fullWidth
-                  onClick={() => navigate('/student/exercises')}
-                >
-                  View Exercises
-                </Button>
-              </CardActions>
-            </Card>
-          </Grid>
+        {/* ACTIONs */}
+        <Box
+          sx={{
+            display: 'flex',
+            flexDirection: 'row',
+            justifyContent: 'center',
+            alignItems: 'center',
+            gap: 5,
+            mt: 5,
+          }}
+        >
+          {/* Start Adventure Button */}
+          <Box
+            onClick={() => navigate('/student/assessment')}
+            sx={{
+              position: 'relative',
+              cursor: 'pointer',
+              transition: 'transform 0.2s',
+              '&:hover': {
+                transform: 'translateY(-8px)',
+              },
+              '&:active': {
+                transform: 'translateY(2px)',
+              },
+            }}
+          >
+            <CardMedia
+              component='img'
+              image={slate}
+              alt='Start Adventure'
+              sx={{
+                height: '100%',
+                width: '100%',
+                maxWidth: 400,
+              }}
+            />
+            <Typography sx={woodTextSx}>Start Adventure</Typography>
+          </Box>
 
-          <Grid item xs={12} md={4}>
-            <Card>
-              <CardContent>
-                <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-                  <TrendingUpIcon sx={{ fontSize: 40, color: 'primary.main', mr: 1 }} />
-                  <Typography variant="h6">View Progress</Typography>
-                </Box>
-                <Typography variant="body2" color="text.secondary">
-                  See how you're improving over time
-                </Typography>
-              </CardContent>
-              <CardActions>
-                <Button
-                  size="large"
-                  variant="contained"
-                  fullWidth
-                  onClick={() => navigate('/student/progress')}
-                >
-                  View Progress
-                </Button>
-              </CardActions>
-            </Card>
-          </Grid>
-        </Grid>
-      </Container>
-    </Box>
+          {/* Read Story Button */}
+          <Box
+            onClick={() => navigate('/student/exercises')}
+            sx={{
+              position: 'relative',
+              cursor: 'pointer',
+              transition: 'transform 0.2s',
+              '&:hover': {
+                transform: 'translateY(-8px)',
+              },
+              '&:active': {
+                transform: 'translateY(2px)',
+              },
+            }}
+          >
+            <CardMedia
+              component='img'
+              image={read_story}
+              alt='Read Story'
+              sx={{
+                height: '100%',
+                width: '100%',
+                maxWidth: 400,
+              }}
+            />
+            <Typography sx={woodTextSx}>Read Story</Typography>
+          </Box>
+
+          {/* Achievements Button */}
+          <Box
+            onClick={() => navigate('/student/progress')}
+            sx={{
+              position: 'relative',
+              cursor: 'pointer',
+              transition: 'transform 0.2s',
+              '&:hover': {
+                transform: 'translateY(-8px)',
+              },
+              '&:active': {
+                transform: 'translateY(2px)',
+              },
+            }}
+          >
+            <CardMedia
+              component='img'
+              image={achievement}
+              alt='Achievements'
+              sx={{
+                height: '100%',
+                width: '100%',
+                maxWidth: 400,
+              }}
+            />
+            <Typography sx={woodTextSx}>Achievements</Typography>
+          </Box>
+        </Box>
+      </Box>
+    </>
   );
-};
+}
