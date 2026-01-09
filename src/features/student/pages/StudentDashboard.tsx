@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Box, CardMedia, Typography } from '@mui/material';
+import { Box, Button, CardMedia, Typography } from '@mui/material';
 
 import welcome_plaque from '../../../assets/dashboard/dashboard_plaque.png';
 import loginBg from '../../../assets/dashboard/dasboardBg.png';
@@ -11,7 +11,7 @@ import board1 from '../../../assets/dashboard/board1.png';
 import level from '../../../assets/dashboard/level.png';
 import slate from '../../../assets/dashboard/slate.png';
 import { useAppDispatch, useAppSelector } from '@app/hooks/app.hooks';
-import { logout } from '@features/auth/redux/slices/auth.slice';
+// import { logout } from '@features/auth/redux/slices/auth.slice';
 import {
   fetchProgress,
   fetchGoals,
@@ -78,10 +78,10 @@ export default function StudentDashboard() {
     dispatch(fetchGoals());
   }, [dispatch, student, navigate]);
 
-  const handleLogout = () => {
-    dispatch(logout());
-    navigate('/');
-  };
+  // const handleLogout = () => {
+  //   dispatch(logout());
+  //   navigate('/');
+  // };
 
   return (
     <>
@@ -96,6 +96,27 @@ export default function StudentDashboard() {
           backgroundPosition: 'center',
         }}
       >
+         <Box
+            onClick={() => navigate('/student/explorer/testingPage')}
+            sx={{
+              position: 'absolute',
+              top: 20,
+              right: 20,
+              cursor: 'pointer',
+              padding: 1,
+              backgroundColor: 'rgba(255, 255, 255, 0.7)',
+              borderRadius: 2,
+              boxShadow: '0 2px 4px rgba(0,0,0,0.3)',
+              transition: 'background-color 0.2s',
+              '&:hover': {
+                backgroundColor: 'rgba(255, 255, 255, 0.9)',
+              },
+               zIndex: 9999
+            }}
+          >
+            <Typography >Testing Page</Typography>
+          </Box>
+
         <Box sx={{ position: 'relative' }}>
           {/* welcome back plaque */}
           <CardMedia
@@ -121,6 +142,8 @@ export default function StudentDashboard() {
             <Box component='span'>back to Reading Forest</Box>
           </Typography>
         </Box>
+
+        
 
         {/* LEVEL */}
         {progress && (
@@ -275,94 +298,7 @@ export default function StudentDashboard() {
                     </Typography>
                   </Box>
                 )})}
-                {/* <Box sx={{ position: 'relative' }}>
-                  <CardMedia
-                    component='img'
-                    image={board1}
-                    alt='welcome plaque'
-                    sx={{
-                      height: '100%',
-                      width: 400,
-                      maxWidth: 700,
-                      // margin: { xs: 'auto', sm: 'auto' },
-                    }}
-                  />
-                  <Typography
-                    sx={{
-                      ...woodTextSx,
-                      top: '25%',
-                      left: 170,
-                      whiteSpace: 'nowrap',
-                    }}
-                  >
-                    Read 5 Stories
-                  </Typography>
-                  <Typography
-                    sx={{
-                      ...woodTextSx,
-                      top: '63%',
-                      left: 170,
-                      whiteSpace: 'nowrap',
-                    }}
-                  >
-                    1/5 finished
-                  </Typography>
-                  <Typography
-                    sx={{
-                      ...woodTextSx,
-                      top: '80%',
-                      left: 170,
-                      whiteSpace: 'nowrap',
-                      fontSize: '0.9rem',
-                    }}
-                  >
-                    7 days left
-                  </Typography>
-                </Box>
-                <Box sx={{ position: 'relative' }}>
-                  <CardMedia
-                    component='img'
-                    image={board1}
-                    alt='welcome plaque'
-                    sx={{
-                      height: '100%',
-                      width: 400,
-                      maxWidth: 700,
-                      // margin: { xs: 'auto', sm: 'auto' },
-                    }}
-                  />
-                  <Typography
-                    sx={{
-                      ...woodTextSx,
-                      top: '25%',
-                      left: 170,
-                      whiteSpace: 'nowrap',
-                    }}
-                  >
-                    Earn 90 Stars
-                  </Typography>
-                  <Typography
-                    sx={{
-                      ...woodTextSx,
-                      top: '63%',
-                      left: 170,
-                      whiteSpace: 'nowrap',
-                    }}
-                  >
-                    85/90
-                  </Typography>
-                  <Typography
-                    sx={{
-                      ...woodTextSx,
-                      top: '80%',
-                      left: 170,
-                      whiteSpace: 'nowrap',
-                      fontSize: '0.9rem',
-                    }}
-                  >
-                    30 days left
-                  </Typography>
-                </Box> */}
+                
               </>
             )}
           </Box>

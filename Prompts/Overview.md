@@ -269,3 +269,7 @@ Use clear headings and bullet points.
 Include concrete examples (folder trees, route maps).
 Do NOT write full code unless explicitly asked.
 
+![alt text](image-2.png)
+![alt text](image-2.png)
+![alt text](image-2.png)
+![alt text](image-2.png)
