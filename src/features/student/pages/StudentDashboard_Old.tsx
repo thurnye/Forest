@@ -256,7 +256,7 @@ export const StudentDashboard_Old = () => {
                   size="large"
                   variant="contained"
                   fullWidth
-                  onClick={() => navigate('/student/exercises')}
+                  onClick={() => navigate('/student/read-story')}
                 >
                   View Exercises
                 </Button>

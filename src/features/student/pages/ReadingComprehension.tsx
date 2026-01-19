@@ -26,7 +26,7 @@ import {
   clearCurrentExercise,
 } from '@features/student/redux/slices/student.slice';
 
-export const ExerciseDetailPage = () => {
+export const ReadingComprehension = () => {
   const { exerciseId } = useParams<{ exerciseId: string }>();
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
@@ -83,7 +83,7 @@ export const ExerciseDetailPage = () => {
       <Box>
         <AppBar position="static">
           <Toolbar>
-            <IconButton edge="start" color="inherit" onClick={() => navigate('/student/exercises')}>
+            <IconButton edge="start" color="inherit" onClick={() => navigate('/student/read-story')}>
               <ArrowBackIcon />
             </IconButton>
             <Typography variant="h6">Exercise Not Found</Typography>
@@ -103,7 +103,7 @@ export const ExerciseDetailPage = () => {
       <Box>
         <AppBar position="static">
           <Toolbar>
-            <IconButton edge="start" color="inherit" onClick={() => navigate('/student/exercises')}>
+            <IconButton edge="start" color="inherit" onClick={() => navigate('/student/read-story')}>
               <ArrowBackIcon />
             </IconButton>
             <Typography variant="h6">Exercise Complete</Typography>
@@ -120,7 +120,7 @@ export const ExerciseDetailPage = () => {
             </Alert>
 
             <Box sx={{ display: 'flex', gap: 2, justifyContent: 'center' }}>
-              <Button variant="contained" onClick={() => navigate('/student/exercises')}>
+              <Button variant="contained" onClick={() => navigate('/student/read-story')}>
                 Back to Exercises
               </Button>
               <Button variant="outlined" onClick={() => navigate('/student')}>
@@ -137,7 +137,7 @@ export const ExerciseDetailPage = () => {
     <Box>
       <AppBar position="static">
         <Toolbar>
-          <IconButton edge="start" color="inherit" onClick={() => navigate('/student/exercises')}>
+          <IconButton edge="start" color="inherit" onClick={() => navigate('/student/read-story')}>
             <ArrowBackIcon />
           </IconButton>
           <Typography variant="h6">{currentExercise.title}</Typography>

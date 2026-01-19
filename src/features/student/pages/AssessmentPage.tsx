@@ -98,7 +98,7 @@ export const AssessmentPage = () => {
             </Box>
 
             <Box sx={{ display: 'flex', gap: 2, justifyContent: 'center' }}>
-              <Button variant="contained" onClick={() => navigate('/student/exercises')}>
+              <Button variant="contained" onClick={() => navigate('/student/read-story')}>
                 Start Exercises
               </Button>
               <Button variant="outlined" onClick={() => navigate('/student')}>

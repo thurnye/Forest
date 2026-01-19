@@ -86,7 +86,7 @@ export const ExercisesListPage = () => {
                       size="large"
                       variant={exercise.isCompleted ? 'outlined' : 'contained'}
                       fullWidth
-                      onClick={() => navigate(`/student/exercises/${exercise.id}`)}
+                      onClick={() => navigate(`/student/read-story/${exercise.id}`)}
                     >
                       {exercise.isCompleted ? 'Review' : 'Start Exercise'}
                     </Button>

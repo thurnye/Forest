@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Box, Button, CardMedia, Typography } from '@mui/material';
+import { Box, CardMedia, Typography } from '@mui/material';
 
 import welcome_plaque from '../../../assets/dashboard/dashboard_plaque.png';
 import loginBg from '../../../assets/dashboard/dasboardBg.png';
@@ -345,7 +345,7 @@ export default function StudentDashboard() {
 
           {/* Read Story Button */}
           <Box
-            onClick={() => navigate('/student/exercises')}
+            onClick={() => navigate('/student/read-story')}
             sx={{
               position: 'relative',
               cursor: 'pointer',

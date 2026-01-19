@@ -9,7 +9,9 @@ import squareBtn from '../../../assets/practiceExercise/green-sq-btn.png';
 import PillBtn from '../../../assets/practiceExercise/pill-Button.png';
 import { useNavigate } from 'react-router-dom';
 
-export default function TestingPage() {
+
+// fix the back button in HeaderPlaque
+export default function ReadStoryPage() {
   const navigate = useNavigate();
 
   return (
