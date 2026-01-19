@@ -1,14 +1,15 @@
 import { Box } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import headerPlaque from '../../../assets/practiceExercise/clean-header.png';
-import BackArrow from '../../../assets/icons/BackArrow.png';
+import BackArrow from '../../../assets/icons/backArrow.png';
 
 interface HeaderPlaqueProps {
   title: string;
   width?: number | string;
+  backTo: string;
 }
 
-export const HeaderPlaque = ({ title, width = '100%' }: HeaderPlaqueProps) => {
+export const HeaderPlaque = ({ title, width = '100%', backTo }: HeaderPlaqueProps) => {
   const navigate = useNavigate();
 
   return (
@@ -29,6 +30,25 @@ export const HeaderPlaque = ({ title, width = '100%' }: HeaderPlaqueProps) => {
           height: 'auto',
         }}
       >
+        <style>
+          {`
+            .back-arrow {
+              cursor: pointer;
+              transform-origin: center;
+              transform-box: fill-box;
+            }
+            .back-arrow:hover {
+              animation: shake 0.4s ease;
+            }
+            @keyframes shake {
+              0%, 100% { transform: translateX(0); }
+              20% { transform: translateX(-5px); }
+              40% { transform: translateX(5px); }
+              60% { transform: translateX(-5px); }
+              80% { transform: translateX(5px); }
+            }
+          `}
+        </style>
         {/* Background image */}
         <image
           href={headerPlaque}
@@ -39,8 +59,8 @@ export const HeaderPlaque = ({ title, width = '100%' }: HeaderPlaqueProps) => {
 
         {/* back arrow */}
         <g
-          style={{ cursor: 'pointer' }}
-          onClick={() => navigate(-1)}
+          className='back-arrow'
+          onClick={() => navigate(backTo)}
         >
           <image
             x='3%'

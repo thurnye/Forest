@@ -28,7 +28,7 @@ export default function ReadStoryPage() {
         }}
       >
         {/* title header */}
-        <HeaderPlaque title='Practice Quest' />
+        <HeaderPlaque title='Practice Quest' backTo='/student'/>
 
         <Box
           sx={{
