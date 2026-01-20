@@ -48,6 +48,23 @@ export default function ReadStoryPage() {
               height: 'auto',
             }}
           >
+            <style>
+              {`
+                .hover-btn {
+                  cursor: pointer;
+                  transition: transform 0.2s ease, filter 0.2s ease;
+                  transform-origin: center;
+                  transform-box: fill-box;
+                }
+                .hover-btn:hover {
+                  transform: translateY(-8px);
+                  filter: brightness(1.1);
+                }
+                .hover-btn:active {
+                  transform: translateY(2px);
+                }
+              `}
+            </style>
             {/* Board background image */}
             <image
               href={board}
@@ -191,7 +208,7 @@ export default function ReadStoryPage() {
                 Quick Story + 3 questions
               </text>
               <g
-                style={{ cursor: 'pointer' }}
+                className='hover-btn'
                 onClick={() => navigate('/student/read-story/exercise-1')}
               >
                 <image
@@ -264,7 +281,7 @@ export default function ReadStoryPage() {
                 </tspan>
               </text>
               <g
-                style={{ cursor: 'pointer' }}
+                className='hover-btn'
                 onClick={() => navigate('/student/read-story/exercise-2')}
               >
                 <image
@@ -337,7 +354,7 @@ export default function ReadStoryPage() {
                 </tspan>
               </text>
               <g
-                style={{ cursor: 'pointer' }}
+                className='hover-btn'
                 onClick={() => navigate('/student/read-story/exercise-3')}
               >
                 <image
@@ -368,7 +385,7 @@ export default function ReadStoryPage() {
             <g>
               {/* Green button - All */}
               <g
-                style={{ cursor: 'pointer' }}
+                className='hover-btn'
                 onClick={() => console.log('All clicked')}
               >
                 <image
@@ -396,7 +413,7 @@ export default function ReadStoryPage() {
 
               {/* Yellow button - To Do */}
               <g
-                style={{ cursor: 'pointer' }}
+                className='hover-btn'
                 onClick={() => console.log('To Do clicked')}
               >
                 <image
@@ -424,7 +441,7 @@ export default function ReadStoryPage() {
 
               {/* Brown button - Done */}
               <g
-                style={{ cursor: 'pointer' }}
+                className='hover-btn'
                 onClick={() => console.log('Done clicked')}
               >
                 <image
