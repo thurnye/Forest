@@ -1,9 +1,10 @@
 import { Student, UserRole, ReadingLevel } from '@shared/types/api.types';
-import { StudentDetail } from '@features/parent_teacher/redux/slices/parent_teacher.slice';
+// import { StudentDetail } from '@features/guardian/redux/slices/guardian.slice';
 import { Exercise } from '@features/student/redux/slices/student.slice';
+import { StudentDetail } from '../types/guardian.types';
 
 // Mock students - using let to allow mutations
-export let mockStudents: Student[] = [
+export const mockStudents: Student[] = [
   {
     id: 'student-1',
     email: 'student@test.com',
@@ -34,7 +35,7 @@ export let mockStudents: Student[] = [
   },
 ];
 
-export let mockStudentDetails: Record<string, StudentDetail> = {
+export const mockStudentDetails: Record<string, StudentDetail> = {
   'student-1': {
     id: 'student-1',
     email: 'student@test.com',
@@ -71,33 +72,43 @@ export let mockStudentDetails: Record<string, StudentDetail> = {
         id: 'attempt-1',
         exerciseId: 'exercise-1',
         studentId: 'student-1',
-        answers: { 'q1': 'answer1', 'q2': 'answer2' },
+        answers: { q1: 'answer1', q2: 'answer2' },
         score: 90,
         feedback: 'Excellent work!',
-        completedAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(),
-        startedAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000 - 5 * 60 * 1000).toISOString(),
+        completedAt: new Date(
+          Date.now() - 2 * 24 * 60 * 60 * 1000,
+        ).toISOString(),
+        startedAt: new Date(
+          Date.now() - 2 * 24 * 60 * 60 * 1000 - 5 * 60 * 1000,
+        ).toISOString(),
         timeSpentSeconds: 300, // 5 minutes
       },
       {
         id: 'attempt-2',
         exerciseId: 'exercise-2',
         studentId: 'student-1',
-        answers: { 'q1': 'answer1', 'q2': 'answer2', 'q3': 'answer3' },
+        answers: { q1: 'answer1', q2: 'answer2', q3: 'answer3' },
         score: 80,
         feedback: 'Great job!',
-        completedAt: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString(),
-        startedAt: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000 - 7 * 60 * 1000).toISOString(),
+        completedAt: new Date(
+          Date.now() - 1 * 24 * 60 * 60 * 1000,
+        ).toISOString(),
+        startedAt: new Date(
+          Date.now() - 1 * 24 * 60 * 60 * 1000 - 7 * 60 * 1000,
+        ).toISOString(),
         timeSpentSeconds: 420, // 7 minutes
       },
       {
         id: 'attempt-3',
         exerciseId: 'exercise-3',
         studentId: 'student-1',
-        answers: { 'q1': 'answer1' },
+        answers: { q1: 'answer1' },
         score: 85,
         feedback: 'Good work!',
         completedAt: new Date(Date.now() - 3 * 60 * 60 * 1000).toISOString(),
-        startedAt: new Date(Date.now() - 3 * 60 * 60 * 1000 - 4 * 60 * 1000).toISOString(),
+        startedAt: new Date(
+          Date.now() - 3 * 60 * 60 * 1000 - 4 * 60 * 1000,
+        ).toISOString(),
         timeSpentSeconds: 240, // 4 minutes
       },
     ],
@@ -138,22 +149,28 @@ export let mockStudentDetails: Record<string, StudentDetail> = {
         id: 'attempt-4',
         exerciseId: 'exercise-2',
         studentId: 'student-2',
-        answers: { 'q1': 'answer1' },
+        answers: { q1: 'answer1' },
         score: 75,
         feedback: 'Good effort!',
-        completedAt: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString(),
-        startedAt: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000 - 10 * 60 * 1000).toISOString(),
+        completedAt: new Date(
+          Date.now() - 1 * 24 * 60 * 60 * 1000,
+        ).toISOString(),
+        startedAt: new Date(
+          Date.now() - 1 * 24 * 60 * 60 * 1000 - 10 * 60 * 1000,
+        ).toISOString(),
         timeSpentSeconds: 600, // 10 minutes
       },
       {
         id: 'attempt-5',
         exerciseId: 'exercise-1',
         studentId: 'student-2',
-        answers: { 'q1': 'answer1', 'q2': 'answer2' },
+        answers: { q1: 'answer1', q2: 'answer2' },
         score: 80,
         feedback: 'Excellent work!',
         completedAt: new Date(Date.now() - 5 * 60 * 60 * 1000).toISOString(),
-        startedAt: new Date(Date.now() - 5 * 60 * 60 * 1000 - 6 * 60 * 1000).toISOString(),
+        startedAt: new Date(
+          Date.now() - 5 * 60 * 60 * 1000 - 6 * 60 * 1000,
+        ).toISOString(),
         timeSpentSeconds: 360, // 6 minutes
       },
     ],

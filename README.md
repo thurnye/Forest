@@ -17,6 +17,7 @@ A children's literacy platform focused on early reading development, built with 
 ## 🎯 Overview
 
 Reading Forest is an MVP platform that helps young children learn to read through:
+
 - Adaptive reading level assessments
 - Personalized reading exercises
 - Progress tracking for students
@@ -26,6 +27,7 @@ Reading Forest is an MVP platform that helps young children learn to read throug
 ## 🛠 Tech Stack
 
 ### Frontend
+
 - **Framework**: React 18 with TypeScript
 - **Build Tool**: Vite
 - **Routing**: React Router v6
@@ -36,6 +38,7 @@ Reading Forest is an MVP platform that helps young children learn to read throug
 - **API Mocking**: Mock Service Worker (MSW)
 
 ### Key Libraries
+
 - `@reduxjs/toolkit` - State management
 - `@mui/material` - UI components
 - `react-hook-form` - Form validation
@@ -90,20 +93,20 @@ src/
 │   │   └── mock/
 │   │       └── student.mock.ts
 │   │
-│   └── parent_teacher/         # Parent/Teacher feature
+│   └── guardian/         # Parent/Teacher feature
 │       ├── pages/
 │       │   ├── ParentTeacherDashboard.tsx
 │       │   ├── StudentListPage.tsx
 │       │   ├── StudentDetailPage.tsx
 │       │   └── AssignExercisePage.tsx
 │       ├── services/
-│       │   └── parent_teacher.api.service.ts
+│       │   └── guardian.api.service.ts
 │       ├── redux/slices/
-│       │   └── parent_teacher.slice.ts
+│       │   └── guardian.slice.ts
 │       ├── router/
-│       │   └── parent_teacher.routes.tsx
+│       │   └── guardian.routes.tsx
 │       └── mock/
-│           └── parent_teacher.mock.ts
+│           └── guardian.mock.ts
 │
 ├── shared/                     # Shared utilities and services
 │   ├── services/
@@ -132,22 +135,26 @@ src/
 ### Installation
 
 1. Clone the repository:
+
 ```bash
 git clone <repository-url>
 cd ReadingForest
 ```
 
 2. Install dependencies:
+
 ```bash
 npm install
 ```
 
 3. Start the development server:
+
 ```bash
 npm run dev
 ```
 
 4. Open your browser and navigate to:
+
 ```
 http://localhost:3000
 ```
@@ -157,20 +164,24 @@ http://localhost:3000
 The app comes with pre-configured test accounts (MSW mocks):
 
 **Student Account:**
+
 - Email: `student@test.com`
 - Password: `any password`
 
 **Parent Account:**
+
 - Email: `parent@test.com`
 - Password: `any password`
 
 **Teacher Account:**
+
 - Email: `teacher@test.com`
 - Password: `any password`
 
 ## ✨ Features
 
 ### For Students
+
 - ✅ Sign up / Sign in
 - ✅ Take reading level assessments
 - ✅ View personalized exercises
@@ -178,6 +189,7 @@ The app comes with pre-configured test accounts (MSW mocks):
 - ✅ Track progress and scores
 
 ### For Parents/Teachers
+
 - ✅ Sign up / Sign in
 - ✅ Link existing students or create new student accounts
 - ✅ View all linked students
@@ -186,6 +198,7 @@ The app comes with pre-configured test accounts (MSW mocks):
 - ✅ Assign exercises to students
 
 ### Security Features
+
 - ✅ Input sanitization
 - ✅ XSS protection
 - ✅ Password validation
@@ -230,12 +243,14 @@ The project follows a **feature-based (vertical slice)** architecture where each
 All API endpoints are currently mocked using MSW. The base URL is `http://localhost:5000/api`.
 
 ### Authentication
+
 - `POST /auth/login` - User login
 - `POST /auth/signup` - User registration
 - `GET /auth/me` - Get current user
 - `GET /auth/verify` - Verify token
 
 ### Student
+
 - `POST /student/assessment` - Submit assessment
 - `GET /student/exercises` - Get exercises
 - `GET /student/exercises/:id` - Get exercise by ID
@@ -244,6 +259,7 @@ All API endpoints are currently mocked using MSW. The base URL is `http://localh
 - `GET /student/assessments` - Get assessment history
 
 ### Parent/Teacher
+
 - `GET /parent-teacher/students` - Get all linked students
 - `GET /parent-teacher/students/:id` - Get student detail
 - `POST /parent-teacher/students/link` - Link existing student
@@ -311,6 +327,7 @@ npm run lint
 ### MSW Mocking
 
 All API requests are intercepted by MSW in development mode. To disable mocking:
+
 - Remove or comment out the MSW initialization in `src/main.tsx`
 
 ## 🔐 Security
@@ -340,6 +357,7 @@ All API requests are intercepted by MSW in development mode. To disable mocking:
 ### MVP Scope
 
 This is an MVP implementation focused on core functionality:
+
 - No payment/subscription system
 - No real-time messaging
 - No mobile app
@@ -359,6 +377,7 @@ This is an MVP implementation focused on core functionality:
 ## 🤝 Contributing
 
 When contributing to this project:
+
 1. Follow the established folder structure
 2. Maintain TypeScript strict mode compliance
 3. Add appropriate error handling
@@ -372,6 +391,3 @@ This project is private and proprietary.
 ---
 
 **Built with ❤️ for young learners**
-
-
-

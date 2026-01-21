@@ -6,7 +6,7 @@ import { ProtectedRoute } from '@app/routes/ProtectedRoute';
 import { PublicRoute } from '@app/routes/PublicRoute';
 import { AuthRoutes } from '@features/auth/router/auth.routes';
 import { StudentRoutes } from '@features/student/router/student.routes';
-import { ParentTeacherRoutes } from '@features/parent_teacher/router/parent_teacher.routes';
+import { ParentTeacherRoutes } from '@features/guardian/router/guardian.routes';
 import { UserRole } from '@shared/types/api.types';
 
 // Create Material-UI theme
@@ -64,31 +64,31 @@ function App() {
           <Routes>
             {/* Public routes - redirect if authenticated */}
             <Route element={<PublicRoute />}>
-              <Route path="/*" element={<AuthRoutes />} />
+              <Route path='/*' element={<AuthRoutes />} />
             </Route>
 
             {/* Student routes - protected */}
             <Route
-              path="/student/*"
-              element={
-                <ProtectedRoute allowedRoles={[UserRole.STUDENT]} />
-              }
+              path='/student/*'
+              element={<ProtectedRoute allowedRoles={[UserRole.STUDENT]} />}
             >
-              <Route path="*" element={<StudentRoutes />} />
+              <Route path='*' element={<StudentRoutes />} />
             </Route>
 
             {/* Parent/Teacher routes - protected */}
             <Route
-              path="/parent-teacher/*"
+              path='/parent-teacher/*'
               element={
-                <ProtectedRoute allowedRoles={[UserRole.PARENT, UserRole.TEACHER]} />
+                <ProtectedRoute
+                  allowedRoles={[UserRole.PARENT, UserRole.TEACHER]}
+                />
               }
             >
-              <Route path="*" element={<ParentTeacherRoutes />} />
+              <Route path='*' element={<ParentTeacherRoutes />} />
             </Route>
 
             {/* Fallback route */}
-            <Route path="*" element={<Navigate to="/" replace />} />
+            <Route path='*' element={<Navigate to='/' replace />} />
           </Routes>
         </BrowserRouter>
       </ThemeProvider>

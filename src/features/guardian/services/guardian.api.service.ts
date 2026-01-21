@@ -1,20 +1,23 @@
 import { ApiResponse, Student, UserRole } from '@shared/types/api.types';
-import { StudentDetail } from '@features/parent_teacher/redux/slices/parent_teacher.slice';
 import { Exercise, Goal } from '@features/student/redux/slices/student.slice';
 import {
   mockStudents,
   mockStudentDetails,
   mockAvailableExercises,
-} from '@features/parent_teacher/mock/parent_teacher.mock';
+} from '@features/guardian/mock/guardian.mock';
 import { mockGoals } from '@features/student/mock/student.mock';
 
 import { DiagnosticResult } from '@shared/types/api.types';
+import { StudentDetail } from '../types/guardian.types';
 
 // In-memory store for diagnostic status overrides
-export const diagnosticOverrides = new Map<string, {
-  diagnosticEnabled: boolean;
-  hasCompletedDiagnostic: boolean;
-}>();
+export const diagnosticOverrides = new Map<
+  string,
+  {
+    diagnosticEnabled: boolean;
+    hasCompletedDiagnostic: boolean;
+  }
+>();
 
 // In-memory store for diagnostic results
 export const diagnosticResults = new Map<string, DiagnosticResult>();
@@ -25,7 +28,7 @@ class ParentTeacherApiService {
    */
   async getStudents(): Promise<ApiResponse<Student[]>> {
     // Simulate API delay
-    await new Promise(resolve => setTimeout(resolve, 500));
+    await new Promise((resolve) => setTimeout(resolve, 500));
 
     return {
       success: true,
@@ -36,9 +39,11 @@ class ParentTeacherApiService {
   /**
    * Get detailed information about a specific student - using mock data
    */
-  async getStudentDetail(studentId: string): Promise<ApiResponse<StudentDetail>> {
+  async getStudentDetail(
+    studentId: string,
+  ): Promise<ApiResponse<StudentDetail>> {
     // Simulate API delay
-    await new Promise(resolve => setTimeout(resolve, 500));
+    await new Promise((resolve) => setTimeout(resolve, 500));
 
     let studentDetail = mockStudentDetails[studentId];
 
@@ -74,9 +79,11 @@ class ParentTeacherApiService {
   /**
    * Link an existing student by email - using mock data
    */
-  async linkStudent(data: { studentEmail: string }): Promise<ApiResponse<Student>> {
+  async linkStudent(data: {
+    studentEmail: string;
+  }): Promise<ApiResponse<Student>> {
     // Simulate API delay
-    await new Promise(resolve => setTimeout(resolve, 500));
+    await new Promise((resolve) => setTimeout(resolve, 500));
 
     // Find student by email
     const student = mockStudents.find((s) => s.email === data.studentEmail);
@@ -103,7 +110,7 @@ class ParentTeacherApiService {
     diagnosticEnabled: boolean;
   }): Promise<ApiResponse<Student>> {
     // Simulate API delay
-    await new Promise(resolve => setTimeout(resolve, 500));
+    await new Promise((resolve) => setTimeout(resolve, 500));
 
     // Check if student exists
     const existingStudent = mockStudents.find((s) => s.email === data.email);
@@ -136,9 +143,12 @@ class ParentTeacherApiService {
   /**
    * Assign an exercise to a student - using mock data
    */
-  async assignExercise(studentId: string, _exerciseId: string): Promise<ApiResponse<void>> {
+  async assignExercise(
+    studentId: string,
+    _exerciseId: string,
+  ): Promise<ApiResponse<void>> {
     // Simulate API delay
-    await new Promise(resolve => setTimeout(resolve, 500));
+    await new Promise((resolve) => setTimeout(resolve, 500));
 
     // Verify student exists
     const student = mockStudents.find((s) => s.id === studentId);
@@ -157,7 +167,7 @@ class ParentTeacherApiService {
    */
   async getAvailableExercises(): Promise<ApiResponse<Exercise[]>> {
     // Simulate API delay
-    await new Promise(resolve => setTimeout(resolve, 500));
+    await new Promise((resolve) => setTimeout(resolve, 500));
 
     return {
       success: true,
@@ -170,7 +180,7 @@ class ParentTeacherApiService {
    */
   async unlinkStudent(studentId: string): Promise<ApiResponse<void>> {
     // Simulate API delay
-    await new Promise(resolve => setTimeout(resolve, 500));
+    await new Promise((resolve) => setTimeout(resolve, 500));
 
     const index = mockStudents.findIndex((s) => s.id === studentId);
     if (index === -1) {
@@ -197,7 +207,7 @@ class ParentTeacherApiService {
     deadline: string;
   }): Promise<ApiResponse<Goal>> {
     // Simulate API delay
-    await new Promise(resolve => setTimeout(resolve, 500));
+    await new Promise((resolve) => setTimeout(resolve, 500));
 
     // Verify student exists
     const student = mockStudents.find((s) => s.id === data.studentId);
@@ -232,7 +242,7 @@ class ParentTeacherApiService {
    */
   async getStudentGoals(studentId: string): Promise<ApiResponse<Goal[]>> {
     // Simulate API delay
-    await new Promise(resolve => setTimeout(resolve, 300));
+    await new Promise((resolve) => setTimeout(resolve, 300));
 
     const goals = mockGoals.filter((g) => g.studentId === studentId);
 
@@ -245,9 +255,12 @@ class ParentTeacherApiService {
   /**
    * Toggle diagnostic for a student - using mock data
    */
-  async toggleDiagnostic(studentId: string, enabled: boolean): Promise<ApiResponse<void>> {
+  async toggleDiagnostic(
+    studentId: string,
+    enabled: boolean,
+  ): Promise<ApiResponse<void>> {
     // Simulate API delay
-    await new Promise(resolve => setTimeout(resolve, 500));
+    await new Promise((resolve) => setTimeout(resolve, 500));
 
     const student = mockStudents.find((s) => s.id === studentId);
     if (!student) {
@@ -259,7 +272,10 @@ class ParentTeacherApiService {
     // Store override in memory
     diagnosticOverrides.set(studentId, {
       diagnosticEnabled: enabled,
-      hasCompletedDiagnostic: enabled ? false : (diagnosticOverrides.get(studentId)?.hasCompletedDiagnostic ?? student.hasCompletedDiagnostic),
+      hasCompletedDiagnostic: enabled
+        ? false
+        : (diagnosticOverrides.get(studentId)?.hasCompletedDiagnostic ??
+          student.hasCompletedDiagnostic),
     });
 
     return {
@@ -280,10 +296,10 @@ class ParentTeacherApiService {
       lastName: string;
       email: string;
       targetGradeLevel: import('@shared/types/api.types').ReadingLevel;
-    }
+    },
   ): Promise<ApiResponse<Student>> {
     // Simulate API delay
-    await new Promise(resolve => setTimeout(resolve, 500));
+    await new Promise((resolve) => setTimeout(resolve, 500));
 
     const studentIndex = mockStudents.findIndex((s) => s.id === studentId);
     if (studentIndex === -1) {

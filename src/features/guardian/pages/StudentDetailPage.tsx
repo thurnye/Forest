@@ -40,14 +40,11 @@ import {
 } from '@mui/icons-material';
 import { SkillStrand, SkillLevel } from '@shared/types/api.types';
 import { useAppDispatch, useAppSelector } from '@app/hooks/app.hooks';
-import {
-  fetchStudentDetail,
-  clearSelectedStudent,
-  updateStudent,
-} from '@features/parent_teacher/redux/slices/parent_teacher.slice';
-import { parentTeacherApiService } from '@features/parent_teacher/services/parent_teacher.api.service';
-import { EditStudentDialog } from '@features/parent_teacher/components/EditStudentDialog';
+import { EditStudentDialog } from '@features/guardian/components/EditStudentDialog';
 import { ReadingLevel } from '@shared/types/api.types';
+import { fetchStudentDetail, updateStudent } from '../redux/slices/guardian.asyncThunk';
+import { clearSelectedStudent } from '../redux/slices/guardian.slice';
+import { parentTeacherApiService } from '../services/guardian.api.service';
 
 const strandLabels: Record<SkillStrand, string> = {
   [SkillStrand.PHONOLOGICAL_AWARENESS]: 'Sound Awareness',
@@ -74,7 +71,7 @@ export const StudentDetailPage = () => {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
   const { selectedStudent, isLoading } = useAppSelector(
-    (state) => state.parentTeacher
+    (state) => state.parentTeacher,
   );
   const [isTogglingDiagnostic, setIsTogglingDiagnostic] = useState(false);
   const [snackbarOpen, setSnackbarOpen] = useState(false);
@@ -102,7 +99,7 @@ export const StudentDetailPage = () => {
       console.log(studentId, newStatus);
       const result = await parentTeacherApiService.toggleDiagnostic(
         studentId,
-        newStatus
+        newStatus,
       );
 
       if (result.success) {
@@ -127,13 +124,13 @@ export const StudentDetailPage = () => {
       lastName: string;
       email: string;
       targetGradeLevel: ReadingLevel;
-    }
+    },
   ) => {
     await dispatch(
       updateStudent({
         studentId,
         ...data,
-      })
+      }),
     ).unwrap();
 
     setSnackbarMessage('Student information updated successfully');
@@ -158,7 +155,7 @@ export const StudentDetailPage = () => {
   const completionPercentage = Math.round(
     (selectedStudent.progress.exercisesCompleted /
       selectedStudent.progress.totalExercises) *
-      100
+      100,
   );
 
   return (
@@ -210,10 +207,15 @@ export const StudentDetailPage = () => {
 
       <Container maxWidth='lg' sx={{ mt: 4, mb: 4 }}>
         <Paper sx={{ p: 3, mb: 3 }}>
-          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
-            <Typography variant='h5'>
-              Student Information
-            </Typography>
+          <Box
+            sx={{
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              mb: 2,
+            }}
+          >
+            <Typography variant='h5'>Student Information</Typography>
             <Button
               variant='outlined'
               size='small'
@@ -265,34 +267,37 @@ export const StudentDetailPage = () => {
                   Diagnostic Status
                 </Typography>
               </Box>
-              <Box sx={{ mt: 0.5, display: 'flex', alignItems: 'center', gap: 1 }}>
+              <Box
+                sx={{ mt: 0.5, display: 'flex', alignItems: 'center', gap: 1 }}
+              >
                 <Chip
                   label={
                     selectedStudent.hasCompletedDiagnostic
                       ? 'Completed'
                       : selectedStudent.diagnosticEnabled
-                      ? 'Pending'
-                      : 'Disabled'
+                        ? 'Pending'
+                        : 'Disabled'
                   }
                   color={
                     selectedStudent.hasCompletedDiagnostic
                       ? 'success'
                       : selectedStudent.diagnosticEnabled
-                      ? 'warning'
-                      : 'default'
+                        ? 'warning'
+                        : 'default'
                   }
                   size='small'
                 />
-                {selectedStudent.hasCompletedDiagnostic && selectedStudent.diagnosticResult && (
-                  <IconButton
-                    size='small'
-                    color='primary'
-                    onClick={() => setDiagnosticDialogOpen(true)}
-                    title='View diagnostic results'
-                  >
-                    <VisibilityIcon fontSize='small' />
-                  </IconButton>
-                )}
+                {selectedStudent.hasCompletedDiagnostic &&
+                  selectedStudent.diagnosticResult && (
+                    <IconButton
+                      size='small'
+                      color='primary'
+                      onClick={() => setDiagnosticDialogOpen(true)}
+                      title='View diagnostic results'
+                    >
+                      <VisibilityIcon fontSize='small' />
+                    </IconButton>
+                  )}
               </Box>
             </Grid>
           </Grid>
@@ -365,7 +370,7 @@ export const StudentDetailPage = () => {
           <Typography variant='body2' color='text.secondary' sx={{ mt: 2 }}>
             Last activity:{' '}
             {new Date(
-              selectedStudent.progress.lastActivityAt
+              selectedStudent.progress.lastActivityAt,
             ).toLocaleDateString()}
           </Typography>
         </Paper>
@@ -408,8 +413,8 @@ export const StudentDetailPage = () => {
                               attempt.score >= 80
                                 ? 'success'
                                 : attempt.score >= 60
-                                ? 'warning'
-                                : 'error'
+                                  ? 'warning'
+                                  : 'error'
                             }
                           />
                         </TableCell>
@@ -475,7 +480,6 @@ export const StudentDetailPage = () => {
             </Typography>
           )}
         </Paper>
-
       </Container>
 
       {/* Edit Student Dialog */}
@@ -494,9 +498,17 @@ export const StudentDetailPage = () => {
         fullWidth
       >
         <DialogTitle>
-          <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+          <Box
+            sx={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+            }}
+          >
             <Box sx={{ display: 'flex', alignItems: 'center' }}>
-              <CheckCircleIcon sx={{ fontSize: 28, color: 'success.main', mr: 1 }} />
+              <CheckCircleIcon
+                sx={{ fontSize: 28, color: 'success.main', mr: 1 }}
+              />
               <Typography variant='h6' fontWeight='medium'>
                 Diagnostic Assessment Results
               </Typography>
@@ -517,7 +529,7 @@ export const StudentDetailPage = () => {
               <Typography variant='body2' color='text.secondary' sx={{ mb: 3 }}>
                 Completed on{' '}
                 {new Date(
-                  selectedStudent.diagnosticResult.completedAt
+                  selectedStudent.diagnosticResult.completedAt,
                 ).toLocaleDateString()}
               </Typography>
 
@@ -557,7 +569,11 @@ export const StudentDetailPage = () => {
                       >
                         Recommended Starting Level
                       </Typography>
-                      <Typography variant='h4' fontWeight='bold' color='primary'>
+                      <Typography
+                        variant='h4'
+                        fontWeight='bold'
+                        color='primary'
+                      >
                         {selectedStudent.diagnosticResult.recommendedStartingLevel
                           .replace('-', ' ')
                           .toUpperCase()}
@@ -569,81 +585,97 @@ export const StudentDetailPage = () => {
 
               <Divider sx={{ my: 3 }} />
 
-              <Typography variant='h6' gutterBottom fontWeight='medium' sx={{ mb: 2 }}>
+              <Typography
+                variant='h6'
+                gutterBottom
+                fontWeight='medium'
+                sx={{ mb: 2 }}
+              >
                 Skill Breakdown
               </Typography>
 
               <Grid container spacing={2}>
-                {selectedStudent.diagnosticResult.strandResults.map((result) => (
-                  <Grid item xs={12} sm={6} key={result.strand}>
-                    <Card variant='outlined'>
-                      <CardContent>
-                        <Box
-                          sx={{
-                            display: 'flex',
-                            justifyContent: 'space-between',
-                            alignItems: 'center',
-                            mb: 2,
-                          }}
-                        >
-                          <Typography variant='subtitle1' fontWeight='medium'>
-                            {strandLabels[result.strand]}
-                          </Typography>
-                          <Chip
-                            label={skillLevelLabels[result.level]}
-                            color={skillLevelColors[result.level]}
-                            size='small'
-                          />
-                        </Box>
-
-                        <Box sx={{ mb: 2 }}>
+                {selectedStudent.diagnosticResult.strandResults.map(
+                  (result) => (
+                    <Grid item xs={12} sm={6} key={result.strand}>
+                      <Card variant='outlined'>
+                        <CardContent>
                           <Box
                             sx={{
                               display: 'flex',
                               justifyContent: 'space-between',
-                              mb: 1,
+                              alignItems: 'center',
+                              mb: 2,
                             }}
                           >
-                            <Typography variant='body2' color='text.secondary'>
-                              Accuracy
+                            <Typography variant='subtitle1' fontWeight='medium'>
+                              {strandLabels[result.strand]}
                             </Typography>
-                            <Typography variant='body2' fontWeight='medium'>
-                              {result.accuracy}%
+                            <Chip
+                              label={skillLevelLabels[result.level]}
+                              color={skillLevelColors[result.level]}
+                              size='small'
+                            />
+                          </Box>
+
+                          <Box sx={{ mb: 2 }}>
+                            <Box
+                              sx={{
+                                display: 'flex',
+                                justifyContent: 'space-between',
+                                mb: 1,
+                              }}
+                            >
+                              <Typography
+                                variant='body2'
+                                color='text.secondary'
+                              >
+                                Accuracy
+                              </Typography>
+                              <Typography variant='body2' fontWeight='medium'>
+                                {result.accuracy}%
+                              </Typography>
+                            </Box>
+                            <LinearProgress
+                              variant='determinate'
+                              value={result.accuracy}
+                              sx={{ height: 6, borderRadius: 3 }}
+                              color={skillLevelColors[result.level]}
+                            />
+                          </Box>
+
+                          <Box
+                            sx={{
+                              display: 'flex',
+                              justifyContent: 'space-between',
+                            }}
+                          >
+                            <Typography
+                              variant='caption'
+                              color='text.secondary'
+                            >
+                              Placement Level
+                            </Typography>
+                            <Typography variant='caption' fontWeight='medium'>
+                              {result.placementLevel
+                                .replace('-', ' ')
+                                .toUpperCase()}
                             </Typography>
                           </Box>
-                          <LinearProgress
-                            variant='determinate'
-                            value={result.accuracy}
-                            sx={{ height: 6, borderRadius: 3 }}
-                            color={skillLevelColors[result.level]}
-                          />
-                        </Box>
-
-                        <Box
-                          sx={{
-                            display: 'flex',
-                            justifyContent: 'space-between',
-                          }}
-                        >
-                          <Typography variant='caption' color='text.secondary'>
-                            Placement Level
-                          </Typography>
-                          <Typography variant='caption' fontWeight='medium'>
-                            {result.placementLevel
-                              .replace('-', ' ')
-                              .toUpperCase()}
-                          </Typography>
-                        </Box>
-                      </CardContent>
-                    </Card>
-                  </Grid>
-                ))}
+                        </CardContent>
+                      </Card>
+                    </Grid>
+                  ),
+                )}
               </Grid>
             </>
           )}
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setDiagnosticDialogOpen(false)} variant='contained'>
+          <Button
+            onClick={() => setDiagnosticDialogOpen(false)}
+            variant='contained'
+          >
             Close
           </Button>
         </DialogActions>

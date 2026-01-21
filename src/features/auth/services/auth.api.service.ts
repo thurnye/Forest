@@ -1,7 +1,14 @@
 import { apiClient } from '@shared/services/apiClient.service';
-import { ApiResponse, User, UserRole, Student, Parent, Teacher } from '@shared/types/api.types';
+import {
+  ApiResponse,
+  User,
+  UserRole,
+  Student,
+  Parent,
+  Teacher,
+} from '@shared/types/api.types';
 import { mockUsers } from '@features/auth/mock/auth.mock';
-import { diagnosticOverrides } from '@features/parent_teacher/services/parent_teacher.api.service';
+import { diagnosticOverrides } from '@features/guardian/services/guardian.api.service';
 
 export interface LoginResponse {
   user: User;
@@ -40,7 +47,7 @@ class AuthApiService {
     password: string;
   }): Promise<ApiResponse<LoginResponse>> {
     // Simulate API delay
-    await new Promise(resolve => setTimeout(resolve, 500));
+    await new Promise((resolve) => setTimeout(resolve, 500));
 
     const foundUser = mockUsers.find((u) => u.email === credentials.email);
 
@@ -49,7 +56,9 @@ class AuthApiService {
     }
 
     // Apply diagnostic overrides
-    const user = applyDiagnosticOverrides(foundUser as Student | Parent | Teacher);
+    const user = applyDiagnosticOverrides(
+      foundUser as Student | Parent | Teacher,
+    );
 
     const token = `mock-jwt-token-${user.id}`;
     apiClient.setToken(token);
@@ -65,7 +74,7 @@ class AuthApiService {
    */
   async signup(data: SignupRequest): Promise<ApiResponse<LoginResponse>> {
     // Simulate API delay
-    await new Promise(resolve => setTimeout(resolve, 500));
+    await new Promise((resolve) => setTimeout(resolve, 500));
 
     // Check if user already exists
     const existingUser = mockUsers.find((u) => u.email === data.email);
@@ -127,7 +136,7 @@ class AuthApiService {
    */
   async getCurrentUser(): Promise<ApiResponse<User>> {
     // Simulate API delay
-    await new Promise(resolve => setTimeout(resolve, 300));
+    await new Promise((resolve) => setTimeout(resolve, 300));
 
     const token = apiClient.getToken();
     if (!token) {
@@ -142,7 +151,9 @@ class AuthApiService {
     }
 
     // Apply diagnostic overrides
-    const user = applyDiagnosticOverrides(foundUser as Student | Parent | Teacher);
+    const user = applyDiagnosticOverrides(
+      foundUser as Student | Parent | Teacher,
+    );
 
     return {
       success: true,

@@ -1,7 +1,7 @@
 import { configureStore } from '@reduxjs/toolkit';
 import authReducer from '@features/auth/redux/slices/auth.slice';
 import studentReducer from '@features/student/redux/slices/student.slice';
-import parentTeacherReducer from '@features/parent_teacher/redux/slices/parent_teacher.slice';
+import parentTeacherReducer from '@features/guardian/redux/slices/guardian.slice';
 import explorerReducer from '@features/explorer/redux/slices/explorer.slice';
 
 /**

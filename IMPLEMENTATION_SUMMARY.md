@@ -22,6 +22,7 @@ The Reading Forest MVP frontend has been successfully implemented according to t
 ## 🎯 Completed Requirements
 
 ### ✅ Tech Stack (As Required)
+
 - ✅ React + TypeScript
 - ✅ Vite (chosen over CRA for better performance)
 - ✅ React Router v6
@@ -31,13 +32,14 @@ The Reading Forest MVP frontend has been successfully implemented according to t
 - ✅ Material UI (chosen over Bootstrap for comprehensive component library)
 
 ### ✅ Feature-Based Architecture
+
 ```
 src/
 ├── app/                      # ✅ Global configuration
 ├── features/                 # ✅ 3 feature modules
 │   ├── auth/                # ✅ Complete
 │   ├── student/             # ✅ Complete
-│   └── parent_teacher/      # ✅ Complete
+│   └── guardian/      # ✅ Complete
 ├── shared/                   # ✅ Shared utilities
 └── mocks/                    # ✅ MSW setup
 ```
@@ -45,6 +47,7 @@ src/
 ### ✅ User Flows Implemented
 
 #### Student Features
+
 - ✅ Sign up / Sign in
 - ✅ Take reading assessment (passage + questions)
 - ✅ Submit assessment answers
@@ -54,6 +57,7 @@ src/
 - ✅ View basic progress metrics
 
 #### Parent/Teacher Features
+
 - ✅ Sign up / Sign in
 - ✅ Link existing student OR create new student
 - ✅ View student list
@@ -64,6 +68,7 @@ src/
 ### ✅ Core Infrastructure
 
 #### Routing
+
 - ✅ Protected routes with authentication checks
 - ✅ Role-based route gating
 - ✅ Public routes (redirect if authenticated)
@@ -71,12 +76,14 @@ src/
 - ✅ `/parent-teacher/*` - Parent/Teacher routes
 
 #### State Management
+
 - ✅ Centralized Redux store
 - ✅ Typed Redux hooks (useAppDispatch, useAppSelector)
 - ✅ Feature-specific slices
 - ✅ Async thunks for API calls
 
 #### API Layer
+
 - ✅ Centralized Axios client
 - ✅ Request/response interceptors
 - ✅ Token injection
@@ -84,12 +91,14 @@ src/
 - ✅ Sensitive data redaction
 
 #### MSW Mocking
+
 - ✅ Complete mock handlers for all endpoints
 - ✅ Mock user database
 - ✅ Mock exercises and assessments
 - ✅ Works fully offline without backend
 
 ### ✅ Security Implementation
+
 - ✅ Input sanitization helper
 - ✅ HTML sanitization (DOMPurify)
 - ✅ Password validation
@@ -105,6 +114,7 @@ src/
 ## 📁 Files Created
 
 ### Configuration Files (7)
+
 - ✅ package.json
 - ✅ tsconfig.json
 - ✅ tsconfig.node.json
@@ -114,24 +124,28 @@ src/
 - ✅ index.html
 
 ### App-Level Files (4)
+
 - ✅ src/App.tsx
 - ✅ src/main.tsx
 - ✅ src/index.css
 - ✅ src/vite-env.d.ts
 
 ### App Configuration (3)
+
 - ✅ src/app/stores/stores.ts
 - ✅ src/app/hooks/app.hooks.ts
 - ✅ src/app/routes/ProtectedRoute.tsx
 - ✅ src/app/routes/PublicRoute.tsx
 
 ### Shared Utilities (3)
+
 - ✅ src/shared/services/apiClient.service.ts
 - ✅ src/shared/types/api.types.ts
 - ✅ src/shared/utils/security.utils.ts
 - ✅ src/shared/utils/botDetection.utils.ts
 
 ### Auth Feature (5)
+
 - ✅ pages/SignInPage.tsx
 - ✅ pages/SignUpPage.tsx
 - ✅ services/auth.api.service.ts
@@ -140,6 +154,7 @@ src/
 - ✅ mock/auth.mock.ts
 
 ### Student Feature (8)
+
 - ✅ pages/StudentDashboard.tsx
 - ✅ pages/AssessmentPage.tsx
 - ✅ pages/ExercisesListPage.tsx
@@ -151,21 +166,24 @@ src/
 - ✅ mock/student.mock.ts
 
 ### Parent/Teacher Feature (7)
+
 - ✅ pages/ParentTeacherDashboard.tsx
 - ✅ pages/StudentListPage.tsx
 - ✅ pages/StudentDetailPage.tsx
 - ✅ pages/AssignExercisePage.tsx
-- ✅ services/parent_teacher.api.service.ts
-- ✅ redux/slices/parent_teacher.slice.ts
-- ✅ router/parent_teacher.routes.tsx
-- ✅ mock/parent_teacher.mock.ts
+- ✅ services/guardian.api.service.ts
+- ✅ redux/slices/guardian.slice.ts
+- ✅ router/guardian.routes.tsx
+- ✅ mock/guardian.mock.ts
 
 ### MSW Configuration (3)
+
 - ✅ src/mocks/handlers.ts
 - ✅ src/mocks/browser.ts
 - ✅ public/mockServiceWorker.js
 
 ### Documentation (4)
+
 - ✅ README.md (comprehensive)
 - ✅ QUICKSTART.md
 - ✅ .env.example
@@ -176,12 +194,14 @@ src/
 ## 🎨 UI/UX Features
 
 ### Material-UI Theme
+
 - ✅ Custom color scheme (forest green + orange)
 - ✅ Consistent typography
 - ✅ Responsive design
 - ✅ Accessible components
 
 ### User Experience
+
 - ✅ Loading states with spinners
 - ✅ Error handling with alerts
 - ✅ Form validation with helpful messages
@@ -194,12 +214,14 @@ src/
 ## 🔌 API Endpoints (All Mocked)
 
 ### Authentication (4)
+
 - ✅ POST /auth/login
 - ✅ POST /auth/signup
 - ✅ GET /auth/me
 - ✅ GET /auth/verify
 
 ### Student (6)
+
 - ✅ POST /student/assessment
 - ✅ GET /student/exercises
 - ✅ GET /student/exercises/:id
@@ -208,6 +230,7 @@ src/
 - ✅ GET /student/assessments
 
 ### Parent/Teacher (6)
+
 - ✅ GET /parent-teacher/students
 - ✅ GET /parent-teacher/students/:id
 - ✅ POST /parent-teacher/students/link
@@ -222,6 +245,7 @@ src/
 ## 🧪 Testing Instructions
 
 ### Quick Test
+
 ```bash
 npm install
 npm run dev
@@ -229,11 +253,13 @@ npm run dev
 ```
 
 ### Test Accounts
+
 - Student: student@test.com (any password)
 - Parent: parent@test.com (any password)
 - Teacher: teacher@test.com (any password)
 
 ### Build Verification
+
 ```bash
 npm run build
 # ✅ Build successful
@@ -246,12 +272,14 @@ npm run build
 ## 📋 Architecture Highlights
 
 ### Separation of Concerns
+
 - ✅ Features are completely isolated
 - ✅ No cross-feature dependencies
 - ✅ Shared code in dedicated directory
 - ✅ Clear boundaries enforced
 
 ### Type Safety
+
 - ✅ TypeScript strict mode enabled
 - ✅ All components typed
 - ✅ API responses typed
@@ -259,6 +287,7 @@ npm run build
 - ✅ Form validation with Zod schemas
 
 ### Best Practices
+
 - ✅ Functional components with hooks
 - ✅ Redux Toolkit for simplified Redux
 - ✅ Async thunks for side effects
@@ -271,7 +300,9 @@ npm run build
 ## 🚀 What's Next?
 
 ### Ready to Use
+
 The application is fully functional and can be used immediately for:
+
 - User signup/signin
 - Student assessments
 - Exercise completion
@@ -279,12 +310,15 @@ The application is fully functional and can be used immediately for:
 - Parent/teacher monitoring
 
 ### Backend Integration
+
 When ready to connect to a real backend:
+
 1. Update `VITE_API_BASE_URL` in `.env`
 2. Remove or disable MSW initialization in `main.tsx`
 3. Ensure backend matches the API contracts
 
 ### Production Deployment
+
 ```bash
 npm run build
 # Deploy the `dist/` folder to your hosting service
@@ -297,6 +331,7 @@ npm run build
 **All requirements from `prompts/frontend_instructions.md` have been successfully implemented!**
 
 The Reading Forest MVP frontend is:
+
 - ✅ Fully functional
 - ✅ Type-safe
 - ✅ Well-structured
@@ -310,6 +345,6 @@ The Reading Forest MVP frontend is:
 
 ---
 
-*Generated on: December 20, 2025*
-*Project: Reading Forest MVP Frontend*
-*Status: COMPLETE*
+_Generated on: December 20, 2025_
+_Project: Reading Forest MVP Frontend_
+_Status: COMPLETE_

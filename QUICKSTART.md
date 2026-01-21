@@ -3,16 +3,19 @@
 ## 🚀 Get Started in 3 Steps
 
 ### 1. Install Dependencies
+
 ```bash
 npm install
 ```
 
 ### 2. Start Development Server
+
 ```bash
 npm run dev
 ```
 
 ### 3. Open in Browser
+
 Navigate to `http://localhost:3000`
 
 ## 🔑 Test Accounts
@@ -20,16 +23,19 @@ Navigate to `http://localhost:3000`
 The app includes mock data with pre-configured accounts:
 
 ### Student
+
 - **Email**: `student@test.com`
 - **Password**: any password works
 - **Features**: Take assessments, complete exercises, view progress
 
 ### Parent
+
 - **Email**: `parent@test.com`
 - **Password**: any password works
 - **Features**: Add students, monitor progress, assign exercises
 
 ### Teacher
+
 - **Email**: `teacher@test.com`
 - **Password**: any password works
 - **Features**: Manage students, view progress, assign exercises
@@ -37,6 +43,7 @@ The app includes mock data with pre-configured accounts:
 ## 📱 User Flows to Test
 
 ### Student Flow
+
 1. Sign in with student@test.com
 2. Click "Start Assessment"
 3. Answer the 3 questions
@@ -46,6 +53,7 @@ The app includes mock data with pre-configured accounts:
 7. Check your progress
 
 ### Parent/Teacher Flow
+
 1. Sign in with parent@test.com
 2. View linked students (2 pre-populated)
 3. Click on a student to view details
@@ -54,6 +62,7 @@ The app includes mock data with pre-configured accounts:
 6. Select an exercise to assign
 
 ### Create New Account
+
 1. Click "Sign Up"
 2. Fill in the form
 3. Choose role (Student/Parent/Teacher)
@@ -77,18 +86,21 @@ npm run lint         # Run ESLint
 ## 🎨 Features Included
 
 ### ✅ Authentication
+
 - Sign up / Sign in
 - Role-based routing (Student, Parent, Teacher)
 - Protected routes
 - Token-based authentication
 
 ### ✅ Student Features
+
 - Reading level assessments
 - Practice exercises with questions
 - Progress tracking
 - Score history
 
 ### ✅ Parent/Teacher Features
+
 - Student management
 - Link existing or create new students
 - Monitor student progress
@@ -96,6 +108,7 @@ npm run lint         # Run ESLint
 - View assessment results
 
 ### ✅ Security
+
 - Input sanitization
 - XSS protection
 - Password validation
@@ -120,7 +133,7 @@ src/
 ├── features/      # Feature modules
 │   ├── auth/      # Authentication
 │   ├── student/   # Student features
-│   └── parent_teacher/  # Parent/Teacher features
+│   └── guardian/  # Parent/Teacher features
 ├── shared/        # Shared utilities
 └── mocks/         # API mocks (MSW)
 ```
@@ -128,12 +141,14 @@ src/
 ## 🐛 Troubleshooting
 
 ### Port already in use
+
 ```bash
 # The app runs on port 3000 by default
 # If port 3000 is in use, Vite will suggest another port
 ```
 
 ### Dependencies not installing
+
 ```bash
 # Clear cache and reinstall
 rm -rf node_modules package-lock.json
@@ -141,6 +156,7 @@ npm install
 ```
 
 ### Build errors
+
 ```bash
 # Make sure you're using Node.js 18+
 node --version
