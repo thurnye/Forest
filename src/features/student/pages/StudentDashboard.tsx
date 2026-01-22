@@ -67,6 +67,8 @@ export default function StudentDashboard() {
   //   navigate('/');
   // };
 
+  console.log('Student Dashboard rendered', { progress, goals });
+
   return (
     <>
       <Box

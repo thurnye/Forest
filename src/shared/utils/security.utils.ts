@@ -32,6 +32,31 @@ export const sanitizeInput = (input: string): string => {
   return sanitized;
 };
 
+// Recursively sanitize all string properties in an object
+export const sanitizeObject = <T extends Record<string, any>>(obj: T): T => {
+  const sanitized = { ...obj };
+  for (const key in sanitized) {
+    if (typeof sanitized[key] === 'string') {
+      sanitized[key] = sanitizeInput(sanitized[key]) as any;
+    } else if (
+      typeof sanitized[key] === 'object' &&
+      sanitized[key] !== null &&
+      !Array.isArray(sanitized[key])
+    ) {
+      sanitized[key] = sanitizeObject(sanitized[key]);
+    } else if (Array.isArray(sanitized[key])) {
+      sanitized[key] = sanitized[key].map((item: any) =>
+        typeof item === 'string'
+          ? sanitizeInput(item)
+          : typeof item === 'object'
+          ? sanitizeObject(item)
+          : item
+      ) as any;
+    }
+  }
+  return sanitized;
+};
+
 /**
  * Validates that a string is safe for use in URLs
  * @param input - The string to validate

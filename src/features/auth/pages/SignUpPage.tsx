@@ -19,10 +19,11 @@ import {
   FormHelperText,
 } from '@mui/material';
 import { useAppDispatch, useAppSelector } from '@app/hooks/app.hooks';
-import { signup, clearError } from '@features/auth/redux/slices/auth.slice';
+import {  clearError } from '@features/auth/redux/slices/auth.slice';
 import { UserRole } from '@shared/types/api.types';
 import { sanitizeInput, validatePassword } from '@shared/utils/security.utils';
 import { rateLimiter, performBotCheck } from '@shared/utils/botDetection.utils';
+import { signup } from '../redux/slices/auth.asyncThunks';
 
 // Validation schema
 const signupSchema = z

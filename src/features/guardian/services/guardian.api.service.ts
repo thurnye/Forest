@@ -1,341 +1,456 @@
-import { ApiResponse, Student, UserRole } from '@shared/types/api.types';
+import { apiClient } from '@shared/services/apiClient.service';
+import { ApiResponse, Student, ReadingLevel } from '@shared/types/api.types';
 import { Exercise, Goal } from '@features/student/redux/slices/student.slice';
-import {
-  mockStudents,
-  mockStudentDetails,
-  mockAvailableExercises,
-} from '@features/guardian/mock/guardian.mock';
-import { mockGoals } from '@features/student/mock/student.mock';
-
-import { DiagnosticResult } from '@shared/types/api.types';
 import { StudentDetail } from '../types/guardian.types';
 
-// In-memory store for diagnostic status overrides
-export const diagnosticOverrides = new Map<
-  string,
-  {
-    diagnosticEnabled: boolean;
-    hasCompletedDiagnostic: boolean;
-  }
->();
+// Request DTOs matching backend
+export interface RegisterStudentRequest {
+  password: string;
+  firstName: string;
+  lastName: string;
+  username?: string;
+  avatar?: string;
+  dateOfBirth?: string;
+  grade?: string;
+  targetGradeLevel?: string;
+  diagnosticEnabled?: boolean;
+}
 
-// In-memory store for diagnostic results
-export const diagnosticResults = new Map<string, DiagnosticResult>();
+export interface LinkStudentRequest {
+  studentEmail: string;
+}
 
-class ParentTeacherApiService {
+export interface CreateAssignmentRequest {
+  exerciseId: string;
+  dueDate?: string;
+}
+
+export interface CreateGoalRequest {
+  studentId: string;
+  title: string;
+  description?: string;
+  type: 'exercises' | 'time' | 'streak' | 'score' | 'level';
+  targetValue: number;
+  unit: string;
+  deadline: string;
+}
+
+export interface UpdateDiagnosticRequest {
+  enabled: boolean;
+}
+
+// Backend response types
+interface BackendStudent {
+  _id: string;
+  guardianId?: string;
+  email?: string;
+  firstName: string;
+  lastName: string;
+  username?: string;
+  avatar?: string;
+  dateOfBirth?: string;
+  grade?: string;
+  readingLevel?: string;
+  targetGradeLevel?: string;
+  hasCompletedDiagnostic?: boolean;
+  diagnosticEnabled?: boolean;
+  isActive?: boolean;
+  createdAt?: string;
+  progress?: {
+    currentLevel?: string;
+    exercisesCompleted?: number;
+    averageScore?: number;
+    streakDays?: number;
+    lastActivityAt?: string;
+  };
+}
+
+interface BackendStudentDetail extends BackendStudent {
+  recentAssessments?: Array<{
+    _id: string;
+    type: string;
+    status: string;
+    overallScore?: number;
+    determinedLevel?: string;
+    completedAt?: string;
+  }>;
+  recentExerciseAttempts?: Array<{
+    _id: string;
+    exerciseId: string;
+    score?: number;
+    percentage?: number;
+    status: string;
+    completedAt?: string;
+    timeSpent?: number;
+    exerciseTitle?: string;
+    exerciseReadingLevel?: string;
+  }>;
+}
+
+interface BackendExercise {
+  _id: string;
+  title: string;
+  description: string;
+  type: string;
+  readingLevel: string;
+  skillStrand: string;
+  content?: string;
+  questions: Array<{
+    questionId: string;
+    questionText: string;
+    questionType: string;
+    options?: string[];
+    points: number;
+  }>;
+  totalPoints: number;
+  estimatedTime: number;
+  difficulty: string;
+  tags: string[];
+  isActive: boolean;
+}
+
+interface BackendGoal {
+  _id: string;
+  studentId: string;
+  title: string;
+  description?: string;
+  type: string;
+  targetValue: number;
+  currentValue: number;
+  unit: string;
+  status: string;
+  deadline: string;
+  createdBy?: string;
+  createdAt: string;
+}
+
+// Transform functions
+function transformStudent(backend: BackendStudent): Student {
+  return {
+    id: backend._id,
+    email: backend.email || '',
+    username: backend.username || '',
+    firstName: backend.firstName,
+    lastName: backend.lastName,
+    role: 'STUDENT' as any,
+    readingLevel: backend.readingLevel as ReadingLevel,
+    guardianId: backend.guardianId,
+    targetGradeLevel: backend.targetGradeLevel as ReadingLevel,
+    hasCompletedDiagnostic: backend.hasCompletedDiagnostic || false,
+    diagnosticEnabled: backend.diagnosticEnabled || false,
+    createdAt: backend.createdAt || new Date().toISOString(),
+    updatedAt: backend.createdAt || new Date().toISOString(),
+  };
+}
+
+function transformStudentDetail(backend: BackendStudentDetail): StudentDetail {
+  const student = transformStudent(backend);
+
+  return {
+    ...student,
+    progress: {
+      studentId: backend._id,
+      currentLevel: (backend.progress?.currentLevel || 'pre-k') as ReadingLevel,
+      exercisesCompleted: backend.progress?.exercisesCompleted || 0,
+      totalExercises: 0,
+      averageScore: backend.progress?.averageScore || 0,
+      lastActivityAt: backend.progress?.lastActivityAt || '',
+    },
+    recentAssessments: (backend.recentAssessments || []).map((a) => ({
+      id: a._id,
+      studentId: backend._id,
+      readingLevel: (a.determinedLevel || 'pre-k') as ReadingLevel,
+      score: a.overallScore || 0,
+      feedback: '',
+      completedAt: a.completedAt || '',
+    })),
+    recentExerciseAttempts: (backend.recentExerciseAttempts || []).map((a) => ({
+      id: a._id,
+      exerciseId: a.exerciseId,
+      studentId: backend._id,
+      answers: {},
+      score: a.score || a.percentage || 0,
+      feedback: '',
+      completedAt: a.completedAt || '',
+      startedAt: '',
+      timeSpentSeconds: a.timeSpent || 0,
+    })),
+  };
+}
+
+function transformExercise(backend: BackendExercise): Exercise {
+  return {
+    id: backend._id,
+    title: backend.title,
+    description: backend.description,
+    readingLevel: backend.readingLevel as ReadingLevel,
+    content: backend.content || '',
+    questions: backend.questions.map((q) => ({
+      id: q.questionId,
+      text: q.questionText,
+      type: q.questionType === 'multiple-choice' ? 'multiple-choice' : 'text',
+      options: q.options,
+    })),
+    isCompleted: false,
+  };
+}
+
+function transformGoal(backend: BackendGoal): Goal {
+  return {
+    id: backend._id,
+    studentId: backend.studentId,
+    title: backend.title,
+    description: backend.description || '',
+    targetValue: backend.targetValue,
+    currentValue: backend.currentValue,
+    unit: backend.unit as 'exercises' | 'score' | 'reading-time',
+    deadline: backend.deadline,
+    createdAt: backend.createdAt,
+    createdBy: backend.createdBy || '',
+    isCompleted: backend.status === 'completed',
+  };
+}
+
+class GuardianApiService {
   /**
-   * Get all students linked to this parent/teacher - using mock data
+   * GET /guardian/students
+   * Get all students linked to this guardian
    */
   async getStudents(): Promise<ApiResponse<Student[]>> {
-    // Simulate API delay
-    await new Promise((resolve) => setTimeout(resolve, 500));
+    const response = await apiClient.get<BackendStudent[]>('/guardian/students');
 
-    return {
-      success: true,
-      data: mockStudents,
-    };
-  }
-
-  /**
-   * Get detailed information about a specific student - using mock data
-   */
-  async getStudentDetail(
-    studentId: string,
-  ): Promise<ApiResponse<StudentDetail>> {
-    // Simulate API delay
-    await new Promise((resolve) => setTimeout(resolve, 500));
-
-    let studentDetail = mockStudentDetails[studentId];
-
-    if (!studentDetail) {
-      throw new Error('Student not found');
-    }
-
-    // Apply diagnostic overrides if they exist
-    const override = diagnosticOverrides.get(studentId);
-    if (override) {
-      studentDetail = {
-        ...studentDetail,
-        diagnosticEnabled: override.diagnosticEnabled,
-        hasCompletedDiagnostic: override.hasCompletedDiagnostic,
-      };
-    }
-
-    // Add diagnostic result if it exists
-    const diagnosticResult = diagnosticResults.get(studentId);
-    if (diagnosticResult) {
-      studentDetail = {
-        ...studentDetail,
-        diagnosticResult,
+    if (response.success && response.data) {
+      return {
+        success: true,
+        data: response.data.map(transformStudent),
       };
     }
 
     return {
-      success: true,
-      data: studentDetail,
+      success: false,
+      data: null,
+      message: response.message,
     };
   }
 
   /**
-   * Link an existing student by email - using mock data
+   * GET /guardian/students/:studentId
+   * Get detailed information about a specific student
    */
-  async linkStudent(data: {
-    studentEmail: string;
-  }): Promise<ApiResponse<Student>> {
-    // Simulate API delay
-    await new Promise((resolve) => setTimeout(resolve, 500));
+  async getStudentDetail(studentId: string): Promise<ApiResponse<StudentDetail>> {
+    const response = await apiClient.get<BackendStudentDetail>(`/guardian/students/${studentId}`);
 
-    // Find student by email
-    const student = mockStudents.find((s) => s.email === data.studentEmail);
-
-    if (!student) {
-      throw new Error('Student not found with this email');
+    if (response.success && response.data) {
+      return {
+        success: true,
+        data: transformStudentDetail(response.data),
+      };
     }
 
     return {
-      success: true,
-      data: student,
+      success: false,
+      data: null,
+      message: response.message,
     };
   }
 
   /**
-   * Create a new student account - using mock data
+   * POST /guardian/students/register
+   * Register a new student via auth-service
    */
-  async createStudent(data: {
-    email: string;
-    firstName: string;
-    lastName: string;
-    password: string;
-    targetGradeLevel: import('@shared/types/api.types').ReadingLevel;
-    diagnosticEnabled: boolean;
-  }): Promise<ApiResponse<Student>> {
-    // Simulate API delay
-    await new Promise((resolve) => setTimeout(resolve, 500));
+  async registerStudent(data: RegisterStudentRequest): Promise<ApiResponse<Student>> {
+    const response = await apiClient.post<{ id: string; firstName: string; lastName: string; username: string }>(
+      '/guardian/students/register',
+      data
+    );
 
-    // Check if student exists
-    const existingStudent = mockStudents.find((s) => s.email === data.email);
-    if (existingStudent) {
-      throw new Error('Student with this email already exists');
-    }
-
-    const newStudent: Student = {
-      id: `student-${Date.now()}`,
-      email: data.email,
-      firstName: data.firstName,
-      lastName: data.lastName,
-      role: UserRole.STUDENT,
-      targetGradeLevel: data.targetGradeLevel,
-      hasCompletedDiagnostic: false,
-      diagnosticEnabled: data.diagnosticEnabled,
-      parentId: 'parent-1',
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-    };
-
-    mockStudents.push(newStudent);
-
-    return {
-      success: true,
-      data: newStudent,
-    };
-  }
-
-  /**
-   * Assign an exercise to a student - using mock data
-   */
-  async assignExercise(
-    studentId: string,
-    _exerciseId: string,
-  ): Promise<ApiResponse<void>> {
-    // Simulate API delay
-    await new Promise((resolve) => setTimeout(resolve, 500));
-
-    // Verify student exists
-    const student = mockStudents.find((s) => s.id === studentId);
-    if (!student) {
-      throw new Error('Student not found');
-    }
-
-    return {
-      success: true,
-      data: undefined,
-    };
-  }
-
-  /**
-   * Get all available exercises - using mock data
-   */
-  async getAvailableExercises(): Promise<ApiResponse<Exercise[]>> {
-    // Simulate API delay
-    await new Promise((resolve) => setTimeout(resolve, 500));
-
-    return {
-      success: true,
-      data: mockAvailableExercises,
-    };
-  }
-
-  /**
-   * Unlink a student - using mock data
-   */
-  async unlinkStudent(studentId: string): Promise<ApiResponse<void>> {
-    // Simulate API delay
-    await new Promise((resolve) => setTimeout(resolve, 500));
-
-    const index = mockStudents.findIndex((s) => s.id === studentId);
-    if (index === -1) {
-      throw new Error('Student not found');
-    }
-
-    mockStudents.splice(index, 1);
-
-    return {
-      success: true,
-      data: undefined,
-    };
-  }
-
-  /**
-   * Set a goal for a student - using mock data
-   */
-  async setGoal(data: {
-    studentId: string;
-    title: string;
-    description: string;
-    targetValue: number;
-    unit: 'exercises' | 'score' | 'reading-time';
-    deadline: string;
-  }): Promise<ApiResponse<Goal>> {
-    // Simulate API delay
-    await new Promise((resolve) => setTimeout(resolve, 500));
-
-    // Verify student exists
-    const student = mockStudents.find((s) => s.id === data.studentId);
-    if (!student) {
-      throw new Error('Student not found');
-    }
-
-    const newGoal: Goal = {
-      id: `goal-${Date.now()}`,
-      studentId: data.studentId,
-      title: data.title,
-      description: data.description,
-      targetValue: data.targetValue,
-      currentValue: 0,
-      unit: data.unit,
-      deadline: data.deadline,
-      createdAt: new Date().toISOString(),
-      createdBy: 'parent-1', // Current parent/teacher ID
-      isCompleted: false,
-    };
-
-    mockGoals.push(newGoal);
-
-    return {
-      success: true,
-      data: newGoal,
-    };
-  }
-
-  /**
-   * Get goals for a student - using mock data
-   */
-  async getStudentGoals(studentId: string): Promise<ApiResponse<Goal[]>> {
-    // Simulate API delay
-    await new Promise((resolve) => setTimeout(resolve, 300));
-
-    const goals = mockGoals.filter((g) => g.studentId === studentId);
-
-    return {
-      success: true,
-      data: goals,
-    };
-  }
-
-  /**
-   * Toggle diagnostic for a student - using mock data
-   */
-  async toggleDiagnostic(
-    studentId: string,
-    enabled: boolean,
-  ): Promise<ApiResponse<void>> {
-    // Simulate API delay
-    await new Promise((resolve) => setTimeout(resolve, 500));
-
-    const student = mockStudents.find((s) => s.id === studentId);
-    if (!student) {
-      throw new Error('Student not found');
-    }
-
-    console.log('Toggling diagnostic for student:', studentId, 'to', enabled);
-
-    // Store override in memory
-    diagnosticOverrides.set(studentId, {
-      diagnosticEnabled: enabled,
-      hasCompletedDiagnostic: enabled
-        ? false
-        : (diagnosticOverrides.get(studentId)?.hasCompletedDiagnostic ??
-          student.hasCompletedDiagnostic),
-    });
-
-    return {
-      success: true,
-      message: enabled
-        ? 'Diagnostic enabled. Student will be prompted on next login.'
-        : 'Diagnostic disabled.',
-    };
-  }
-
-  /**
-   * Update student information - using mock data
-   */
-  async updateStudent(
-    studentId: string,
-    data: {
-      firstName: string;
-      lastName: string;
-      email: string;
-      targetGradeLevel: import('@shared/types/api.types').ReadingLevel;
-    },
-  ): Promise<ApiResponse<Student>> {
-    // Simulate API delay
-    await new Promise((resolve) => setTimeout(resolve, 500));
-
-    const studentIndex = mockStudents.findIndex((s) => s.id === studentId);
-    if (studentIndex === -1) {
-      throw new Error('Student not found');
-    }
-
-    // Update the student in the mock data
-    const updatedStudent = {
-      ...mockStudents[studentIndex],
-      firstName: data.firstName,
-      lastName: data.lastName,
-      email: data.email,
-      targetGradeLevel: data.targetGradeLevel,
-      updatedAt: new Date().toISOString(),
-    };
-
-    mockStudents.splice(studentIndex, 1, updatedStudent);
-
-    // Also update in mockStudentDetails if exists
-    if (mockStudentDetails[studentId]) {
-      mockStudentDetails[studentId] = {
-        ...mockStudentDetails[studentId],
-        firstName: data.firstName,
-        lastName: data.lastName,
-        email: data.email,
-        targetGradeLevel: data.targetGradeLevel,
+    if (response.success && response.data) {
+      // Return a minimal student object - full details can be fetched separately
+      const student: Student = {
+        id: response.data.id,
+        email: '',
+        username: response.data.username,
+        firstName: response.data.firstName,
+        lastName: response.data.lastName,
+        role: 'STUDENT' as any,
+        hasCompletedDiagnostic: false,
+        diagnosticEnabled: data.diagnosticEnabled || true,
+        createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
       };
+
+      return {
+        success: true,
+        data: student,
+      };
     }
 
     return {
-      success: true,
-      data: updatedStudent,
-      message: 'Student information updated successfully',
+      success: false,
+      data: null,
+      message: response.message,
+    };
+  }
+
+  /**
+   * POST /guardian/students/link
+   * Link an existing student by email
+   */
+  async linkStudent(data: LinkStudentRequest): Promise<ApiResponse<Student>> {
+    const response = await apiClient.post<BackendStudent>('/guardian/students/link', data);
+
+    if (response.success && response.data) {
+      return {
+        success: true,
+        data: transformStudent(response.data),
+      };
+    }
+
+    return {
+      success: false,
+      data: null,
+      message: response.message,
+    };
+  }
+
+  /**
+   * DELETE /guardian/students/:studentId
+   * Unlink a student from guardian
+   */
+  async unlinkStudent(studentId: string): Promise<ApiResponse<void>> {
+    const response = await apiClient.delete<void>(`/guardian/students/${studentId}`);
+    return response;
+  }
+
+  /**
+   * GET /guardian/exercises
+   * Get all available exercises
+   */
+  async getAvailableExercises(params?: {
+    readingLevel?: string;
+    skillStrand?: string;
+    type?: string;
+    limit?: number;
+    skip?: number;
+  }): Promise<ApiResponse<Exercise[]>> {
+    const queryParams = new URLSearchParams();
+    if (params?.readingLevel) queryParams.append('readingLevel', params.readingLevel);
+    if (params?.skillStrand) queryParams.append('skillStrand', params.skillStrand);
+    if (params?.type) queryParams.append('type', params.type);
+    if (params?.limit) queryParams.append('limit', params.limit.toString());
+    if (params?.skip) queryParams.append('skip', params.skip.toString());
+
+    const url = `/guardian/exercises${queryParams.toString() ? `?${queryParams.toString()}` : ''}`;
+    const response = await apiClient.get<BackendExercise[]>(url);
+
+    if (response.success && response.data) {
+      return {
+        success: true,
+        data: response.data.map(transformExercise),
+      };
+    }
+
+    return {
+      success: false,
+      data: null,
+      message: response.message,
+    };
+  }
+
+  /**
+   * POST /guardian/students/:studentId/assignments
+   * Assign an exercise to a student
+   */
+  async assignExercise(studentId: string, data: CreateAssignmentRequest): Promise<ApiResponse<void>> {
+    const response = await apiClient.post<void>(`/guardian/students/${studentId}/assignments`, data);
+    return response;
+  }
+
+  /**
+   * POST /guardian/goals
+   * Create a goal for a student
+   */
+  async setGoal(data: CreateGoalRequest): Promise<ApiResponse<Goal>> {
+    const response = await apiClient.post<BackendGoal>('/guardian/goals', data);
+
+    if (response.success && response.data) {
+      return {
+        success: true,
+        data: transformGoal(response.data),
+      };
+    }
+
+    return {
+      success: false,
+      data: null,
+      message: response.message,
+    };
+  }
+
+  /**
+   * GET /guardian/students/:studentId/goals
+   * Get goals for a student
+   */
+  async getStudentGoals(studentId: string, params?: {
+    status?: string;
+    limit?: number;
+    skip?: number;
+  }): Promise<ApiResponse<Goal[]>> {
+    const queryParams = new URLSearchParams();
+    if (params?.status) queryParams.append('status', params.status);
+    if (params?.limit) queryParams.append('limit', params.limit.toString());
+    if (params?.skip) queryParams.append('skip', params.skip.toString());
+
+    const url = `/guardian/students/${studentId}/goals${queryParams.toString() ? `?${queryParams.toString()}` : ''}`;
+    const response = await apiClient.get<BackendGoal[]>(url);
+
+    if (response.success && response.data) {
+      return {
+        success: true,
+        data: response.data.map(transformGoal),
+      };
+    }
+
+    return {
+      success: false,
+      data: null,
+      message: response.message,
+    };
+  }
+
+  /**
+   * PATCH /guardian/students/:studentId/diagnostic
+   * Toggle diagnostic for a student
+   */
+  async toggleDiagnostic(studentId: string, enabled: boolean): Promise<ApiResponse<void>> {
+    const response = await apiClient.patch<void>(`/guardian/students/${studentId}/diagnostic`, { enabled });
+    return response;
+  }
+
+  /**
+   * Update student information (not implemented in backend yet)
+   * This would need a PATCH /guardian/students/:studentId endpoint
+   */
+  async updateStudent(
+    _studentId: string,
+    _data: {
+      firstName?: string;
+      lastName?: string;
+      email?: string;
+      targetGradeLevel?: ReadingLevel;
+    }
+  ): Promise<ApiResponse<Student>> {
+    // TODO: Backend endpoint not yet implemented for updating student via guardian
+    // For now, return error
+    return {
+      success: false,
+      data: null,
+      message: 'Update student endpoint not yet implemented',
     };
   }
 }
 
-export const parentTeacherApiService = new ParentTeacherApiService();
+export const guardianApiService = new GuardianApiService();
+
+// Legacy export name for backward compatibility
+export const parentTeacherApiService = guardianApiService;

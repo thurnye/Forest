@@ -8,17 +8,15 @@ import logo from '../../../assets/logo.png';
 import loginBg from '../../../assets/student-login-bg.png';
 import scroll from '../../../assets/scroll.png';
 import { useAppDispatch, useAppSelector } from '@app/hooks/app.hooks';
-import { login, clearError } from '@features/auth/redux/slices/auth.slice';
+import {  clearError } from '@features/auth/redux/slices/auth.slice';
 import { sanitizeInput } from '@shared/utils/security.utils';
 import { rateLimiter } from '@shared/utils/botDetection.utils';
+import { StudentLoginSchema } from '../utils/validator';
+import { login } from '../redux/slices/auth.asyncThunks';
 
-// Validation schema
-const loginSchema = z.object({
-  email: z.string().email('Invalid email address'),
-  password: z.string().min(1, 'Password is required'),
-});
 
-type LoginFormData = z.infer<typeof loginSchema>;
+
+type LoginFormData = z.infer<typeof StudentLoginSchema>;
 
 export default function StudentSignInPage() {
   const dispatch = useAppDispatch();
@@ -29,10 +27,10 @@ export default function StudentSignInPage() {
     handleSubmit,
     formState: { errors },
   } = useForm<LoginFormData>({
-    resolver: zodResolver(loginSchema),
+    resolver: zodResolver(StudentLoginSchema),
     defaultValues: {
-      email: 'student@test.com',
-      password: '123456',
+      username: 'energetic-hornet',
+      password: 'Password123',
     },
   });
 
@@ -48,9 +46,9 @@ export default function StudentSignInPage() {
       return;
     }
 
-    // Sanitize inputs
+    // Sanitize inputs - use username for student login
     const sanitizedData = {
-      email: sanitizeInput(data.email),
+      username: sanitizeInput(data.username),
       password: data.password, // Don't sanitize password
     };
 
@@ -152,14 +150,14 @@ export default function StudentSignInPage() {
               </Alert>
             )}
 
-            {/* Email Input */}
+            {/* Username Input */}
             <TextField
-              {...register('email')}
+              {...register('username')}
               fullWidth
-              placeholder="Enter Your Email"
-              type="email"
-              error={!!errors.email}
-              helperText={errors.email?.message}
+              placeholder="Enter Your Username"
+              type="text"
+              error={!!errors.username}
+              helperText={errors.username?.message}
               InputProps={{
                 sx: {
                   backgroundColor: '#fff',

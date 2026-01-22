@@ -18,9 +18,10 @@ import {
   Star as StarIcon,
 } from '@mui/icons-material';
 import { DiagnosticResult, SkillStrand, SkillLevel } from '@shared/types/api.types';
-import { diagnosticService } from '@features/student/services/diagnostic.service';
+import { diagnosticService } from '@features/diagnosis/services/diagnostic.service';
 import { useAppSelector, useAppDispatch } from '@app/hooks/app.hooks';
-import { getCurrentUser } from '@features/auth/redux/slices/auth.slice';
+import { getCurrentUser } from '@/features/auth/redux/slices/auth.asyncThunks';
+// import { getCurrentUser } from '@features/auth/redux/slices/auth.slice';
 
 const strandLabels: Record<SkillStrand, string> = {
   [SkillStrand.PHONOLOGICAL_AWARENESS]: 'Sound Awareness',

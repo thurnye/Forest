@@ -16,7 +16,7 @@ import {
 } from '@mui/material';
 import { Psychology as PsychologyIcon } from '@mui/icons-material';
 import { useAppSelector } from '@app/hooks/app.hooks';
-import { diagnosticService } from '@features/student/services/diagnostic.service';
+import { diagnosticService } from '@features/diagnosis/services/diagnostic.service';
 import { Student, UserRole } from '@shared/types/api.types';
 
 interface WarmupTask {

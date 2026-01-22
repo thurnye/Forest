@@ -1,12 +1,8 @@
 /**
- * Simple bot detection utilities for MVP
- * These are basic checks and should be enhanced for production
+ * botDetection.utils.ts
+ * Simple bot detection utilities for MVP + headers for ApiClient
  */
 
-/**
- * Generates a simple browser fingerprint for basic bot detection
- * @returns Fingerprint object
- */
 export const generateFingerprint = (): Record<string, unknown> => {
   return {
     userAgent: navigator.userAgent,
@@ -19,10 +15,6 @@ export const generateFingerprint = (): Record<string, unknown> => {
   };
 };
 
-/**
- * Checks for common bot user agent patterns
- * @returns True if likely a bot
- */
 export const detectBotUserAgent = (): boolean => {
   const botPatterns = [
     /bot/i,
@@ -34,36 +26,21 @@ export const detectBotUserAgent = (): boolean => {
   ];
 
   const userAgent = navigator.userAgent;
-  return botPatterns.some(pattern => pattern.test(userAgent));
+  return botPatterns.some((pattern) => pattern.test(userAgent));
 };
 
-/**
- * Checks for automation indicators
- * @returns True if automation is detected
- */
 export const detectAutomation = (): boolean => {
-  // Check for webdriver
-  if (navigator.webdriver) {
+  if (navigator.webdriver) return true;
+  if ((window as any)._phantom || (window as any).callPhantom) return true;
+  if (
+    (document as any).__selenium_unwrapped ||
+    (document as any).__webdriver_evaluate
+  ) {
     return true;
   }
-
-  // Check for phantom
-  if ((window as any)._phantom || (window as any).callPhantom) {
-    return true;
-  }
-
-  // Check for selenium
-  if ((document as any).__selenium_unwrapped || (document as any).__webdriver_evaluate) {
-    return true;
-  }
-
   return false;
 };
 
-/**
- * Performs comprehensive bot check
- * @returns Object with detection results
- */
 export const performBotCheck = (): {
   isLikelyBot: boolean;
   reasons: string[];
@@ -71,20 +48,13 @@ export const performBotCheck = (): {
 } => {
   const reasons: string[] = [];
 
-  if (detectBotUserAgent()) {
-    reasons.push('Bot user agent detected');
-  }
+  if (detectBotUserAgent()) reasons.push('Bot user agent detected');
+  if (detectAutomation()) reasons.push('Automation detected');
 
-  if (detectAutomation()) {
-    reasons.push('Automation detected');
-  }
-
-  // Check for missing browser features
   if (!navigator.languages || navigator.languages.length === 0) {
     reasons.push('Missing browser language support');
   }
 
-  // Check for touch support inconsistency
   const hasTouch = 'ontouchstart' in window;
   const maxTouchPoints = navigator.maxTouchPoints || 0;
   if ((hasTouch && maxTouchPoints === 0) || (!hasTouch && maxTouchPoints > 0)) {
@@ -99,40 +69,65 @@ export const performBotCheck = (): {
 };
 
 /**
+ * Tiny non-crypto hash to keep header small.
+ * Do NOT include timestamp in stable hash.
+ */
+const hashFingerprint = (fingerprint: Record<string, unknown>): string => {
+  const stable = {
+    userAgent: fingerprint.userAgent,
+    language: fingerprint.language,
+    platform: fingerprint.platform,
+    screenResolution: fingerprint.screenResolution,
+    colorDepth: fingerprint.colorDepth,
+    timezone: fingerprint.timezone,
+  };
+
+  const str = JSON.stringify(stable);
+  let hash = 0;
+  for (let i = 0; i < str.length; i++) {
+    hash = (hash * 31 + str.charCodeAt(i)) >>> 0;
+  }
+  return hash.toString(16);
+};
+
+/**
+ * ✅ ApiClient expects this:
+ * Object.assign(config.headers, getBotDetectionHeaders());
+ */
+export const getBotDetectionHeaders = (): Record<string, string> => {
+  const { isLikelyBot, fingerprint } = performBotCheck();
+
+  return {
+    'X-Bot-Fingerprint': hashFingerprint(fingerprint),
+    'X-Bot-Likely': String(isLikelyBot),
+    // 'X-Bot-Reasons': reasons.slice(0, 5).join('|'),
+  };
+};
+
+/**
  * Simple rate limit tracker for form submissions
  */
 class RateLimiter {
   private attempts: Map<string, number[]> = new Map();
 
-  /**
-   * Checks if an action is rate limited
-   * @param key - Unique key for the action (e.g., 'login', 'signup')
-   * @param maxAttempts - Maximum attempts allowed
-   * @param windowMs - Time window in milliseconds
-   * @returns True if rate limit is exceeded
-   */
-  isRateLimited(key: string, maxAttempts: number = 5, windowMs: number = 60000): boolean {
+  isRateLimited(
+    key: string,
+    maxAttempts: number = 5,
+    windowMs: number = 60000
+  ): boolean {
     const now = Date.now();
     const attempts = this.attempts.get(key) || [];
 
-    // Filter out old attempts
-    const recentAttempts = attempts.filter(timestamp => now - timestamp < windowMs);
+    const recentAttempts = attempts.filter((timestamp) => now - timestamp < windowMs);
 
-    if (recentAttempts.length >= maxAttempts) {
-      return true;
-    }
+    if (recentAttempts.length >= maxAttempts) return true;
 
-    // Add current attempt
     recentAttempts.push(now);
     this.attempts.set(key, recentAttempts);
 
     return false;
   }
 
-  /**
-   * Clears rate limit for a key
-   * @param key - The key to clear
-   */
   clear(key: string): void {
     this.attempts.delete(key);
   }

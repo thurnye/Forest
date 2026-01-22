@@ -11,10 +11,12 @@ interface ProtectedRouteProps {
  * Protected route component that checks authentication and role-based access
  */
 export const ProtectedRoute = ({ allowedRoles }: ProtectedRouteProps) => {
-  const { isAuthenticated, user, isLoading } = useAppSelector((state) => state.auth);
+  const { isAuthenticated, user, isLoading, hasBootstrapped } = useAppSelector(
+    (state) => state.auth
+  );
 
-  // Show loading while checking auth
-  if (isLoading) {
+  // Wait for bootstrap to complete before making any decisions
+  if (!hasBootstrapped || isLoading) {
     return (
       <Box
         sx={{

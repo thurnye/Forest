@@ -14,19 +14,17 @@ import {
   Link as MuiLink,
 } from '@mui/material';
 import { useAppDispatch, useAppSelector } from '@app/hooks/app.hooks';
-import { login, clearError } from '@features/auth/redux/slices/auth.slice';
+import { clearError } from '@features/auth/redux/slices/auth.slice';
 import { sanitizeInput } from '@shared/utils/security.utils';
 import { rateLimiter } from '@shared/utils/botDetection.utils';
+import { GuardianLoginSchema } from '../utils/validator';
+import { login } from '../redux/slices/auth.asyncThunks';
 
-// Validation schema
-const loginSchema = z.object({
-  email: z.string().email('Invalid email address'),
-  password: z.string().min(1, 'Password is required'),
-});
 
-type LoginFormData = z.infer<typeof loginSchema>;
 
-export const Parent_Teacher_SignInPage = () => {
+type LoginFormData = z.infer<typeof GuardianLoginSchema>;
+
+export const GuardianSignIn = () => {
   const dispatch = useAppDispatch();
   const { error, isLoading } = useAppSelector((state) => state.auth);
 
@@ -35,10 +33,10 @@ export const Parent_Teacher_SignInPage = () => {
     handleSubmit,
     formState: { errors },
   } = useForm<LoginFormData>({
-    resolver: zodResolver(loginSchema),
+    resolver: zodResolver(GuardianLoginSchema),
     defaultValues: {
-      email: 'student@test.com', 
-      password: '123456' 
+      email: 'parent@gmail.com', 
+      password: 'Password123!' 
     },
   });
 

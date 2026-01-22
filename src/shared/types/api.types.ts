@@ -1,12 +1,28 @@
 /**
  * Shared API types used across the application
+ * Aligned with backend response format
  */
 
 export interface ApiResponse<T = unknown> {
   success: boolean;
-  data?: T;
+  data: T | null;
   message?: string;
-  error?: string;
+  pagination?: {
+    page: number;
+    limit: number;
+    total: number;
+    pages: number;
+  };
+}
+
+export interface ApiErrorResponse {
+  success: boolean;
+  data: null;
+  errors: Array<{
+    code: string;
+    message: string;
+    field?: string;
+  }>;
 }
 
 export interface PaginatedResponse<T> {
@@ -16,20 +32,22 @@ export interface PaginatedResponse<T> {
     page: number;
     limit: number;
     total: number;
-    totalPages: number;
+    pages: number;
   };
 }
 
 export interface ApiError {
   message: string;
   statusCode: number;
-  errors?: Record<string, string[]>;
+  errors?: Array<{ code: string; message: string; field?: string }>;
 }
 
+// User roles - matches backend role values
 export enum UserRole {
-  STUDENT = 'student',
-  PARENT = 'parent',
-  TEACHER = 'teacher',
+  STUDENT = 'STUDENT',
+  PARENT = 'PARENT',
+  TEACHER = 'TEACHER',
+  GUARDIAN = 'GUARDIAN',
 }
 
 export enum ReadingLevel {
@@ -85,8 +103,9 @@ export interface User {
 
 export interface Student extends User {
   role: UserRole.STUDENT;
+  username: string;
   readingLevel?: ReadingLevel;
-  parentId?: string;
+  guardianId?: string;
   teacherId?: string;
   targetGradeLevel?: ReadingLevel; // Grade level set by parent/teacher
   hasCompletedDiagnostic: boolean;
@@ -102,4 +121,32 @@ export interface Parent extends User {
 export interface Teacher extends User {
   role: UserRole.TEACHER;
   students: string[]; // Array of student IDs
+}
+
+// Error Codes matching backend
+export enum ErrorCode {
+  VALIDATION_ERROR = 'VALIDATION_ERROR',
+  AUTHENTICATION_ERROR = 'AUTHENTICATION_ERROR',
+  AUTHORIZATION_ERROR = 'AUTHORIZATION_ERROR',
+  NOT_FOUND = 'NOT_FOUND',
+  CONFLICT_ERROR = 'CONFLICT_ERROR',
+  RATE_LIMIT_ERROR = 'RATE_LIMIT_ERROR',
+  INTERNAL_ERROR = 'INTERNAL_ERROR',
+  SERVICE_UNAVAILABLE = 'SERVICE_UNAVAILABLE',
+  NETWORK_ERROR = 'NETWORK_ERROR',
+  TIMEOUT_ERROR = 'TIMEOUT_ERROR',
+}
+
+// Custom API Error Class
+export class ApiClientError extends Error {
+  constructor(
+    public message: string,
+    public statusCode: number = 500,
+    public code: ErrorCode = ErrorCode.INTERNAL_ERROR,
+    public field?: string,
+    public errors?: ApiError[]
+  ) {
+    super(message);
+    this.name = 'ApiClientError';
+  }
 }

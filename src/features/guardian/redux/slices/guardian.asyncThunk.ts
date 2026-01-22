@@ -53,7 +53,14 @@ export const createStudent = createAsyncThunk(
     { rejectWithValue },
   ) => {
     try {
-      const response = await parentTeacherApiService.createStudent(data);
+      // Use registerStudent instead of createStudent (student registration via auth-service)
+      const response = await parentTeacherApiService.registerStudent({
+        password: data.password,
+        firstName: data.firstName,
+        lastName: data.lastName,
+        targetGradeLevel: data.targetGradeLevel,
+        diagnosticEnabled: data.diagnosticEnabled,
+      });
       return response.data;
     } catch (error: any) {
       return rejectWithValue(error.message || 'Failed to create student');
@@ -70,7 +77,7 @@ export const assignExercise = createAsyncThunk(
     try {
       const response = await parentTeacherApiService.assignExercise(
         studentId,
-        exerciseId,
+        { exerciseId },
       );
       return response.data;
     } catch (error: any) {

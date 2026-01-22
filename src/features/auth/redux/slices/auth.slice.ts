@@ -1,13 +1,15 @@
-import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
-import { User, UserRole } from '@shared/types/api.types';
-import { authApiService } from '@features/auth/services/auth.api.service';
+import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { User } from '@shared/types/api.types';
+import { bootstrapAuth, getCurrentUser, login, signup } from './auth.asyncThunks';
 
 interface AuthState {
   user: User | null;
+  // token is optional; memory-only TokenManager is source of truth
   token: string | null;
   isAuthenticated: boolean;
   isLoading: boolean;
   error: string | null;
+  hasBootstrapped: boolean;
 }
 
 const initialState: AuthState = {
@@ -16,59 +18,17 @@ const initialState: AuthState = {
   isAuthenticated: false,
   isLoading: false,
   error: null,
+  hasBootstrapped: false,
 };
 
-// Async thunks
-export const login = createAsyncThunk(
-  'auth/login',
-  async (credentials: { email: string; password: string }, { rejectWithValue }) => {
-    try {
-      const response = await authApiService.login(credentials);
-      return response.data;
-    } catch (error: any) {
-      return rejectWithValue(error.message || 'Login failed');
-    }
-  }
-);
 
-export const signup = createAsyncThunk(
-  'auth/signup',
-  async (
-    data: {
-      email: string;
-      password: string;
-      firstName: string;
-      lastName: string;
-      role: UserRole;
-    },
-    { rejectWithValue }
-  ) => {
-    try {
-      const response = await authApiService.signup(data);
-      return response.data;
-    } catch (error: any) {
-      return rejectWithValue(error.message || 'Signup failed');
-    }
-  }
-);
-
-export const getCurrentUser = createAsyncThunk(
-  'auth/getCurrentUser',
-  async (_, { rejectWithValue }) => {
-    try {
-      const response = await authApiService.getCurrentUser();
-      return response.data;
-    } catch (error: any) {
-      return rejectWithValue(error.message || 'Failed to get user');
-    }
-  }
-);
 
 const authSlice = createSlice({
   name: 'auth',
   initialState,
   reducers: {
     logout: (state) => {
+      // call authApiService.logout() from UI/thunk if you want to hit backend too
       state.user = null;
       state.token = null;
       state.isAuthenticated = false;
@@ -91,14 +51,15 @@ const authSlice = createSlice({
       })
       .addCase(login.fulfilled, (state, action) => {
         state.isLoading = false;
-        state.user = action.payload?.user || null;
-        state.token = action.payload?.token || null;
+        state.user = action.payload.user;
+        state.token = action.payload.token ?? null; // optional
         state.isAuthenticated = true;
-        state.error = null;
+        state.hasBootstrapped = true;
       })
       .addCase(login.rejected, (state, action) => {
         state.isLoading = false;
         state.error = action.payload as string;
+        state.isAuthenticated = false;
       });
 
     // Signup
@@ -109,29 +70,58 @@ const authSlice = createSlice({
       })
       .addCase(signup.fulfilled, (state, action) => {
         state.isLoading = false;
-        state.user = action.payload?.user || null;
-        state.token = action.payload?.token || null;
+        state.user = action.payload.user;
+        state.token = action.payload.token ?? null; // optional
         state.isAuthenticated = true;
-        state.error = null;
+        state.hasBootstrapped = true;
       })
       .addCase(signup.rejected, (state, action) => {
         state.isLoading = false;
         state.error = action.payload as string;
+        state.isAuthenticated = false;
       });
 
     // Get current user
     builder
       .addCase(getCurrentUser.pending, (state) => {
         state.isLoading = true;
+        state.error = null;
       })
       .addCase(getCurrentUser.fulfilled, (state, action) => {
         state.isLoading = false;
-        state.user = action.payload || null;
+        state.user = action.payload;
         state.isAuthenticated = true;
       })
-      .addCase(getCurrentUser.rejected, (state) => {
+      .addCase(getCurrentUser.rejected, (state, action) => {
         state.isLoading = false;
+        state.error = action.payload as string;
         state.isAuthenticated = false;
+      });
+
+    // Bootstrap auth (restore session on page refresh)
+    builder
+      .addCase(bootstrapAuth.pending, (state) => {
+        state.isLoading = true;
+        state.error = null;
+      })
+      .addCase(bootstrapAuth.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.hasBootstrapped = true;
+        if (action.payload) {
+          state.user = action.payload.user;
+          state.token = action.payload.token ?? null;
+          state.isAuthenticated = true;
+        } else {
+          // No previous session
+          state.isAuthenticated = false;
+        }
+      })
+      .addCase(bootstrapAuth.rejected, (state) => {
+        state.isLoading = false;
+        state.hasBootstrapped = true;
+        state.isAuthenticated = false;
+        state.user = null;
+        state.token = null;
       });
   },
 });

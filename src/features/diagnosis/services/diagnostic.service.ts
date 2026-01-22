@@ -9,7 +9,7 @@ import {
 import {
   diagnosticOverrides,
   diagnosticResults,
-} from '@features/guardian/services/guardian.api.service';
+} from '@features/diagnosis/mock/diagnosis.mock';
 
 /**
  * Diagnostic Service - Mock implementation
@@ -286,6 +286,7 @@ class DiagnosticService {
 
     return {
       success: true,
+      data: null,
       message: 'Diagnostic results saved successfully',
     };
   }

@@ -46,7 +46,7 @@ export const ParentTeacherDashboard = () => {
       <AppBar position='static'>
         <Toolbar>
           <Typography variant='h6' component='div' sx={{ flexGrow: 1 }}>
-            Reading Forest - {user?.role === 'parent' ? 'Parent' : 'Teacher'}
+            Reading Forest - {user?.role === 'PARENT' || user?.role === 'GUARDIAN' ? 'Parent' : 'Teacher'}
           </Typography>
           <Typography variant='body1' sx={{ mr: 2 }}>
             {user?.firstName} {user?.lastName}

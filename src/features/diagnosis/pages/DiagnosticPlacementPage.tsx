@@ -18,7 +18,7 @@ import {
   Book as VocabularyIcon,
 } from '@mui/icons-material';
 import { useAppSelector } from '@app/hooks/app.hooks';
-import { diagnosticService } from '@features/student/services/diagnostic.service';
+import { diagnosticService } from '@features/diagnosis/services/diagnostic.service';
 import { SkillStrand, Student, UserRole } from '@shared/types/api.types';
 
 const strandIcons: Record<SkillStrand, React.ReactNode> = {

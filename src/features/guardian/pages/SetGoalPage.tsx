@@ -66,11 +66,19 @@ export const SetGoalPage = () => {
     setSuccessMessage('');
 
     try {
+      // Map frontend unit to backend type
+      const typeMap: Record<string, 'exercises' | 'time' | 'streak' | 'score' | 'level'> = {
+        'exercises': 'exercises',
+        'score': 'score',
+        'reading-time': 'time',
+      };
+
       await parentTeacherApiService.setGoal({
         studentId,
         title: sanitizeInput(data.title),
         description: sanitizeInput(data.description),
         targetValue: data.targetValue,
+        type: typeMap[data.unit] || 'exercises',
         unit: data.unit,
         deadline: data.deadline,
       });

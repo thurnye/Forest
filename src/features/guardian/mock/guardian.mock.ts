@@ -8,6 +8,7 @@ export const mockStudents: Student[] = [
   {
     id: 'student-1',
     email: 'student@test.com',
+    username: 'alex-student',
     firstName: 'Alex',
     lastName: 'Student',
     role: UserRole.STUDENT,
@@ -15,13 +16,14 @@ export const mockStudents: Student[] = [
     targetGradeLevel: ReadingLevel.GRADE_1,
     hasCompletedDiagnostic: true,
     diagnosticEnabled: false,
-    parentId: 'parent-1',
+    guardianId: 'parent-1',
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
   },
   {
     id: 'student-2',
     email: 'student2@test.com',
+    username: 'emma-student',
     firstName: 'Emma',
     lastName: 'Student',
     role: UserRole.STUDENT,
@@ -29,7 +31,7 @@ export const mockStudents: Student[] = [
     targetGradeLevel: ReadingLevel.KINDERGARTEN,
     hasCompletedDiagnostic: true,
     diagnosticEnabled: false,
-    parentId: 'parent-1',
+    guardianId: 'parent-1',
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
   },
@@ -39,6 +41,7 @@ export const mockStudentDetails: Record<string, StudentDetail> = {
   'student-1': {
     id: 'student-1',
     email: 'student@test.com',
+    username: 'alex-student',
     firstName: 'Alex',
     lastName: 'Student',
     role: UserRole.STUDENT,
@@ -46,7 +49,7 @@ export const mockStudentDetails: Record<string, StudentDetail> = {
     targetGradeLevel: ReadingLevel.GRADE_1,
     hasCompletedDiagnostic: true,
     diagnosticEnabled: false,
-    parentId: 'parent-1',
+    guardianId: 'parent-1',
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
     progress: {
@@ -116,6 +119,7 @@ export const mockStudentDetails: Record<string, StudentDetail> = {
   'student-2': {
     id: 'student-2',
     email: 'student2@test.com',
+    username: 'emma-student',
     firstName: 'Emma',
     lastName: 'Student',
     role: UserRole.STUDENT,
@@ -123,7 +127,7 @@ export const mockStudentDetails: Record<string, StudentDetail> = {
     targetGradeLevel: ReadingLevel.KINDERGARTEN,
     hasCompletedDiagnostic: true,
     diagnosticEnabled: false,
-    parentId: 'parent-1',
+    guardianId: 'parent-1',
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
     progress: {

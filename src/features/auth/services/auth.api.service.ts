@@ -1,182 +1,403 @@
+import { TokenManager } from '@shared/services/apiClient.service';
 import { apiClient } from '@shared/services/apiClient.service';
-import {
-  ApiResponse,
-  User,
-  UserRole,
-  Student,
-  Parent,
-  Teacher,
-} from '@shared/types/api.types';
-import { mockUsers } from '@features/auth/mock/auth.mock';
-import { diagnosticOverrides } from '@features/guardian/services/guardian.api.service';
+import { User, UserRole, Student, Parent, Teacher } from '@shared/types/api.types';
+
+// Backend responses (your existing shapes)
+export interface GuardianLoginResponse {
+  id: string;
+  email: string;
+  firstName: string;
+  lastName: string;
+  bio?: string;
+  avatar?: string;
+  role: string; // 'PARENT' | 'TEACHER' (string from backend)
+  accessToken: string;
+}
+
+export interface StudentLoginResponse {
+  id: string;
+  username: string;
+  firstName: string;
+  lastName: string;
+  avatar?: string;
+  readingLevel?: string;
+  targetGradeLevel?: string;
+  hasCompletedDiagnostic: boolean;
+  diagnosticEnabled: boolean;
+  guardianId?: string;
+  accessToken: string;
+}
 
 export interface LoginResponse {
   user: User;
-  token: string;
+  token: string; // keep for UI convenience, but not persisted
 }
 
-export interface SignupRequest {
+export interface GuardianSignupRequest {
   email: string;
   password: string;
   firstName: string;
   lastName: string;
-  role: UserRole;
+  guardianName?: string;
 }
 
-// Helper function to apply diagnostic overrides to user
-function applyDiagnosticOverrides(user: Student | Parent | Teacher): User {
-  if (user.role === UserRole.STUDENT) {
-    const override = diagnosticOverrides.get(user.id);
-    if (override) {
-      return {
-        ...user,
-        diagnosticEnabled: override.diagnosticEnabled,
-        hasCompletedDiagnostic: override.hasCompletedDiagnostic,
-      } as Student;
-    }
-  }
-  return user as User;
+export interface StudentSignupRequest {
+  password: string;
+  firstName: string;
+  lastName: string;
+  username?: string;
+  targetGradeLevel?: string;
+  diagnosticEnabled?: boolean;
+  guardianId: string;
 }
+
+// User type storage key - stores 'student' or 'guardian' to know which refresh endpoint to use
+const USER_TYPE_KEY = 'rf_user_type';
 
 class AuthApiService {
   /**
-   * Login user - using mock data
+   * Store user type for refresh endpoint selection
    */
-  async login(credentials: {
+  private setUserType(type: 'student' | 'guardian'): void {
+    sessionStorage.setItem(USER_TYPE_KEY, type);
+  }
+
+  /**
+   * Get stored user type
+   */
+  getUserType(): 'student' | 'guardian' | null {
+    return sessionStorage.getItem(USER_TYPE_KEY) as 'student' | 'guardian' | null;
+  }
+
+  /**
+   * Clear user type on logout
+   */
+  private clearUserType(): void {
+    sessionStorage.removeItem(USER_TYPE_KEY);
+  }
+
+  /**
+   * Login guardian (parent/teacher)
+   */
+  async loginGuardian(credentials: {
     email: string;
     password: string;
-  }): Promise<ApiResponse<LoginResponse>> {
-    // Simulate API delay
-    await new Promise((resolve) => setTimeout(resolve, 500));
-
-    const foundUser = mockUsers.find((u) => u.email === credentials.email);
-
-    if (!foundUser) {
-      throw new Error('Invalid email or password');
-    }
-
-    // Apply diagnostic overrides
-    const user = applyDiagnosticOverrides(
-      foundUser as Student | Parent | Teacher,
+  }): Promise<LoginResponse> {
+    const response = await apiClient.post<GuardianLoginResponse>(
+      '/auth/guardian/login',
+      credentials
     );
 
-    const token = `mock-jwt-token-${user.id}`;
-    apiClient.setToken(token);
+    if (!response.success || !response.data) {
+      throw new Error(response.message || 'Login failed');
+    }
 
-    return {
-      success: true,
-      data: { user, token },
+    const guardianData = response.data;
+
+    // Store access token in memory and user type in sessionStorage
+    if (guardianData.accessToken) {
+      TokenManager.setAccessToken(guardianData.accessToken);
+      this.setUserType('guardian');
+    }
+
+    const user: Parent | Teacher = {
+      id: guardianData.id,
+      email: guardianData.email,
+      firstName: guardianData.firstName,
+      lastName: guardianData.lastName,
+      role:
+        guardianData.role === 'TEACHER' ? UserRole.TEACHER : UserRole.PARENT,
+      students: [],
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
     };
+
+    return { user, token: guardianData.accessToken };
   }
 
   /**
-   * Signup new user - using mock data
+   * Login student
    */
-  async signup(data: SignupRequest): Promise<ApiResponse<LoginResponse>> {
-    // Simulate API delay
-    await new Promise((resolve) => setTimeout(resolve, 500));
-
-    // Check if user already exists
-    const existingUser = mockUsers.find((u) => u.email === data.email);
-    if (existingUser) {
-      throw new Error('User with this email already exists');
-    }
-
-    // Create new user based on role
-    let newUser: User;
-    if (data.role === UserRole.STUDENT) {
-      newUser = {
-        id: `user-${Date.now()}`,
-        email: data.email,
-        firstName: data.firstName,
-        lastName: data.lastName,
-        role: data.role,
-        hasCompletedDiagnostic: false,
-        diagnosticEnabled: false,
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-      } as Student;
-    } else if (data.role === UserRole.PARENT) {
-      newUser = {
-        id: `user-${Date.now()}`,
-        email: data.email,
-        firstName: data.firstName,
-        lastName: data.lastName,
-        role: data.role,
-        students: [],
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-      } as Parent;
-    } else {
-      newUser = {
-        id: `user-${Date.now()}`,
-        email: data.email,
-        firstName: data.firstName,
-        lastName: data.lastName,
-        role: data.role,
-        students: [],
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-      } as Teacher;
-    }
-
-    mockUsers.push(newUser as any);
-
-    const token = `mock-jwt-token-${newUser.id}`;
-    apiClient.setToken(token);
-
-    return {
-      success: true,
-      data: { user: newUser, token },
-    };
-  }
-
-  /**
-   * Get current authenticated user - using mock data
-   */
-  async getCurrentUser(): Promise<ApiResponse<User>> {
-    // Simulate API delay
-    await new Promise((resolve) => setTimeout(resolve, 300));
-
-    const token = apiClient.getToken();
-    if (!token) {
-      throw new Error('No token found');
-    }
-
-    const userId = token.replace('mock-jwt-token-', '');
-    const foundUser = mockUsers.find((u) => u.id === userId);
-
-    if (!foundUser) {
-      throw new Error('User not found');
-    }
-
-    // Apply diagnostic overrides
-    const user = applyDiagnosticOverrides(
-      foundUser as Student | Parent | Teacher,
+  async loginStudent(credentials: {
+    username: string;
+    password: string;
+  }): Promise<LoginResponse> {
+    const response = await apiClient.post<StudentLoginResponse>(
+      '/auth/student/login',
+      credentials
     );
 
-    return {
-      success: true,
-      data: user,
+    if (!response.success || !response.data) {
+      throw new Error(response.message || 'Login failed');
+    }
+
+    const studentData = response.data;
+
+    // Store access token in memory and user type in sessionStorage
+    if (studentData.accessToken) {
+      TokenManager.setAccessToken(studentData.accessToken);
+      this.setUserType('student');
+      console.log('[Login] Student logged in, user type set to "student"');
+    }
+
+    const user: Student = {
+      id: studentData.id,
+      email: '', // students use username
+      firstName: studentData.firstName,
+      lastName: studentData.lastName,
+      username: studentData.username,
+      role: UserRole.STUDENT,
+      readingLevel: studentData.readingLevel as any,
+      targetGradeLevel: studentData.targetGradeLevel as any,
+      hasCompletedDiagnostic: studentData.hasCompletedDiagnostic,
+      diagnosticEnabled: studentData.diagnosticEnabled,
+      guardianId: studentData.guardianId,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
     };
+
+    return { user, token: studentData.accessToken };
   }
 
   /**
-   * Logout user
+   * Generic login
    */
+  async login(credentials: {
+    email?: string;
+    username?: string;
+    password: string;
+  }): Promise<LoginResponse> {
+    if (credentials.email) {
+      return this.loginGuardian({
+        email: credentials.email,
+        password: credentials.password,
+      });
+    }
+    if (credentials.username) {
+      return this.loginStudent({
+        username: credentials.username,
+        password: credentials.password,
+      });
+    }
+    throw new Error('Email or username is required');
+  }
+
+  /**
+   * Register guardian
+   */
+  async signupGuardian(
+    data: GuardianSignupRequest
+  ): Promise<{ id: string; email: string }> {
+    const response = await apiClient.post<{ id: string; email: string }>(
+      '/auth/guardian/register',
+      data
+    );
+
+    if (!response.success || !response.data) {
+      throw new Error(response.message || 'Registration failed');
+    }
+
+    return response.data;
+  }
+
+  /**
+   * Register student
+   */
+  async signupStudent(
+    data: StudentSignupRequest
+  ): Promise<{ id: string; username: string }> {
+    const response = await apiClient.post<{ id: string; username: string }>(
+      '/auth/student/register',
+      data
+    );
+
+    if (!response.success || !response.data) {
+      throw new Error(response.message || 'Registration failed');
+    }
+
+    return response.data;
+  }
+
+  /**
+   * Logout (generic)
+   * Clear client token + let backend clear cookies if endpoints exist
+   */
+  async logoutGuardian(): Promise<void> {
+    try {
+      await apiClient.post('/auth/guardian/logout');
+    } finally {
+      TokenManager.clear();
+      this.clearUserType();
+    }
+  }
+
+  async logoutStudent(): Promise<void> {
+    try {
+      await apiClient.post('/auth/student/logout');
+    } finally {
+      TokenManager.clear();
+      this.clearUserType();
+    }
+  }
+
   async logout(): Promise<void> {
-    apiClient.clearToken();
+    TokenManager.clear();
+    this.clearUserType();
   }
 
   /**
-   * Verify token validity
+   * Refresh guardian session - returns user if successful
    */
-  async verifyToken(): Promise<ApiResponse<{ valid: boolean }>> {
-    const token = apiClient.getToken();
-    return {
-      success: true,
-      data: { valid: !!token },
+  async refreshGuardian(): Promise<LoginResponse> {
+    const response = await apiClient.post<GuardianLoginResponse>(
+      '/auth/guardian/refresh'
+    );
+
+    if (!response.success || !response.data) {
+      throw new Error(response.message || 'Refresh failed');
+    }
+
+    const guardianData = response.data;
+
+    if (guardianData.accessToken) {
+      TokenManager.setAccessToken(guardianData.accessToken);
+    }
+
+    const user: Parent | Teacher = {
+      id: guardianData.id,
+      email: guardianData.email,
+      firstName: guardianData.firstName,
+      lastName: guardianData.lastName,
+      role:
+        guardianData.role === 'TEACHER' ? UserRole.TEACHER : UserRole.PARENT,
+      students: [],
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
     };
+
+    return { user, token: guardianData.accessToken };
+  }
+
+  /**
+   * Refresh student session - returns user if successful
+   */
+  async refreshStudent(): Promise<LoginResponse> {
+    console.log('[RefreshStudent] Calling /auth/student/refresh...');
+    const response = await apiClient.post<StudentLoginResponse>(
+      '/auth/student/refresh'
+    );
+    console.log('[RefreshStudent] Response:', response);
+
+    if (!response.success || !response.data) {
+      console.error('[RefreshStudent] Failed:', response.message);
+      throw new Error(response.message || 'Refresh failed');
+    }
+
+    const studentData = response.data;
+
+    if (studentData.accessToken) {
+      TokenManager.setAccessToken(studentData.accessToken);
+    }
+
+    const user: Student = {
+      id: studentData.id,
+      email: '',
+      firstName: studentData.firstName,
+      lastName: studentData.lastName,
+      username: studentData.username,
+      role: UserRole.STUDENT,
+      readingLevel: studentData.readingLevel as any,
+      targetGradeLevel: studentData.targetGradeLevel as any,
+      hasCompletedDiagnostic: studentData.hasCompletedDiagnostic,
+      diagnosticEnabled: studentData.diagnosticEnabled,
+      guardianId: studentData.guardianId,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    };
+
+    return { user, token: studentData.accessToken };
+  }
+
+  /**
+   * Bootstrap auth - try to restore session on page refresh
+   * Uses stored user type to call the correct refresh endpoint
+   */
+  async bootstrapAuth(): Promise<LoginResponse | null> {
+    const userType = this.getUserType();
+    console.log('[Bootstrap] User type from sessionStorage:', userType);
+
+    if (!userType) {
+      console.log('[Bootstrap] No user type found, skipping refresh');
+      return null; // No previous session
+    }
+
+    try {
+      console.log('[Bootstrap] Attempting refresh for:', userType);
+      if (userType === 'guardian') {
+        const result = await this.refreshGuardian();
+        console.log('[Bootstrap] Guardian refresh successful:', result);
+        return result;
+      } else {
+        const result = await this.refreshStudent();
+        console.log('[Bootstrap] Student refresh successful:', result);
+        return result;
+      }
+    } catch (error) {
+      console.error('[Bootstrap] Refresh failed:', error);
+      // Refresh failed - clear everything
+      this.logout();
+      return null;
+    }
+  }
+
+  /**
+   * Token presence check (in-memory)
+   */
+  verifyToken(): { valid: boolean } {
+    return { valid: !!TokenManager.getAccessToken() };
+  }
+
+  isAuthenticated(): boolean {
+    return !!TokenManager.getAccessToken();
+  }
+
+  getToken(): string | null {
+    return TokenManager.getAccessToken();
+  }
+
+  /**
+   * Signup + auto login (backward compatible)
+   */
+  async signup(data: {
+    email: string;
+    password: string;
+    firstName: string;
+    lastName: string;
+    role: UserRole;
+  }): Promise<LoginResponse> {
+    await this.signupGuardian({
+      email: data.email,
+      password: data.password,
+      firstName: data.firstName,
+      lastName: data.lastName,
+    });
+
+    return this.loginGuardian({ email: data.email, password: data.password });
+  }
+
+  /**
+   * Get current user (recommended approach)
+   * Create a backend endpoint like GET /auth/me that returns the user.
+   * This is better than "refresh just to get user info".
+   */
+  async getCurrentUser(): Promise<User> {
+    const response = await apiClient.get<User>('/auth/me');
+
+    if (!response.success || !response.data) {
+      throw new Error(response.message || 'Failed to get user');
+    }
+
+    return response.data;
   }
 }
 

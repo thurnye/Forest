@@ -1,13 +1,16 @@
+import { useEffect, useRef } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { ThemeProvider, createTheme, CssBaseline } from '@mui/material';
 import { Provider } from 'react-redux';
 import { store } from '@app/stores/stores';
+import { useAppDispatch } from '@app/hooks/app.hooks';
 import { ProtectedRoute } from '@app/routes/ProtectedRoute';
 import { PublicRoute } from '@app/routes/PublicRoute';
 import { AuthRoutes } from '@features/auth/router/auth.routes';
 import { StudentRoutes } from '@features/student/router/student.routes';
 import { ParentTeacherRoutes } from '@features/guardian/router/guardian.routes';
 import { UserRole } from '@shared/types/api.types';
+import { bootstrapAuth } from '@features/auth/redux/slices/auth.asyncThunks';
 
 // Create Material-UI theme
 const theme = createTheme({
@@ -55,13 +58,27 @@ const theme = createTheme({
   },
 });
 
-function App() {
+/**
+ * AuthBootstrap - Attempts to restore auth session on app load
+ * Uses ref to prevent double-call in React StrictMode
+ */
+function AuthBootstrap({ children }: { children: React.ReactNode }) {
+  const dispatch = useAppDispatch();
+  const hasBootstrapped = useRef(false);
+
+  useEffect(() => {
+    if (!hasBootstrapped.current) {
+      hasBootstrapped.current = true;
+      dispatch(bootstrapAuth());
+    }
+  }, [dispatch]);
+
+  return <>{children}</>;
+}
+
+function AppRoutes() {
   return (
-    <Provider store={store}>
-      <ThemeProvider theme={theme}>
-        <CssBaseline />
-        <BrowserRouter>
-          <Routes>
+    <Routes>
             {/* Public routes - redirect if authenticated */}
             <Route element={<PublicRoute />}>
               <Route path='/*' element={<AuthRoutes />} />
@@ -90,6 +107,18 @@ function App() {
             {/* Fallback route */}
             <Route path='*' element={<Navigate to='/' replace />} />
           </Routes>
+  );
+}
+
+function App() {
+  return (
+    <Provider store={store}>
+      <ThemeProvider theme={theme}>
+        <CssBaseline />
+        <BrowserRouter>
+          <AuthBootstrap>
+            <AppRoutes />
+          </AuthBootstrap>
         </BrowserRouter>
       </ThemeProvider>
     </Provider>
