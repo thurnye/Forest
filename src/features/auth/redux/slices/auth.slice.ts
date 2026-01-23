@@ -5,7 +5,7 @@ import { bootstrapAuth, getCurrentUser, login, signup } from './auth.asyncThunks
 interface AuthState {
   user: User | null;
   // token is optional; memory-only TokenManager is source of truth
-  token: string | null;
+  // token: string | null;
   isAuthenticated: boolean;
   isLoading: boolean;
   error: string | null;
@@ -14,7 +14,7 @@ interface AuthState {
 
 const initialState: AuthState = {
   user: null,
-  token: null,
+  // token: null,
   isAuthenticated: false,
   isLoading: false,
   error: null,
@@ -30,7 +30,7 @@ const authSlice = createSlice({
     logout: (state) => {
       // call authApiService.logout() from UI/thunk if you want to hit backend too
       state.user = null;
-      state.token = null;
+      // state.token = null;
       state.isAuthenticated = false;
       state.error = null;
     },
@@ -52,7 +52,7 @@ const authSlice = createSlice({
       .addCase(login.fulfilled, (state, action) => {
         state.isLoading = false;
         state.user = action.payload.user;
-        state.token = action.payload.token ?? null; // optional
+        // state.token = action.payload.token ?? null; // optional
         state.isAuthenticated = true;
         state.hasBootstrapped = true;
       })
@@ -71,7 +71,7 @@ const authSlice = createSlice({
       .addCase(signup.fulfilled, (state, action) => {
         state.isLoading = false;
         state.user = action.payload.user;
-        state.token = action.payload.token ?? null; // optional
+        // state.token = action.payload.token ?? null; // optional
         state.isAuthenticated = true;
         state.hasBootstrapped = true;
       })
@@ -109,7 +109,7 @@ const authSlice = createSlice({
         state.hasBootstrapped = true;
         if (action.payload) {
           state.user = action.payload.user;
-          state.token = action.payload.token ?? null;
+          // state.token = action.payload.token ?? null;
           state.isAuthenticated = true;
         } else {
           // No previous session
@@ -121,7 +121,7 @@ const authSlice = createSlice({
         state.hasBootstrapped = true;
         state.isAuthenticated = false;
         state.user = null;
-        state.token = null;
+        // state.token = null;
       });
   },
 });

@@ -1,8 +1,11 @@
+import { lazy } from 'react';
 import { Routes, Route } from 'react-router-dom';
-import { GuardianSignIn } from '@/features/auth/pages/GuardianSignIn';
-import { SignUpPage } from '@features/auth/pages/SignUpPage';
-import { WelcomePage } from '../pages/WelcomePage';
-import StudentSignInPage from '../pages/StudentSignIn';
+
+// Lazy load page components
+const WelcomePage = lazy(() => import('../pages/WelcomePage').then(m => ({ default: m.WelcomePage })));
+const GuardianSignIn = lazy(() => import('@/features/auth/pages/GuardianSignIn').then(m => ({ default: m.GuardianSignIn })));
+const StudentSignInPage = lazy(() => import('../pages/StudentSignIn'));
+const SignUpPage = lazy(() => import('@features/auth/pages/SignUpPage').then(m => ({ default: m.SignUpPage })));
 
 /**
  * Auth feature routes

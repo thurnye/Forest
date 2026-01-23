@@ -1,6 +1,6 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, Suspense } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
-import { ThemeProvider, createTheme, CssBaseline } from '@mui/material';
+import { ThemeProvider, createTheme, CssBaseline, CircularProgress, Box } from '@mui/material';
 import { Provider } from 'react-redux';
 import { store } from '@app/stores/stores';
 import { useAppDispatch } from '@app/hooks/app.hooks';
@@ -57,6 +57,13 @@ const theme = createTheme({
     borderRadius: 8,
   },
 });
+
+// Loading fallback component for lazy-loaded routes
+const PageLoader = () => (
+  <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '100vh' }}>
+    <CircularProgress />
+  </Box>
+);
 
 /**
  * AuthBootstrap - Attempts to restore auth session on app load
@@ -117,7 +124,9 @@ function App() {
         <CssBaseline />
         <BrowserRouter>
           <AuthBootstrap>
-            <AppRoutes />
+            <Suspense fallback={<PageLoader />}>
+              <AppRoutes />
+            </Suspense>
           </AuthBootstrap>
         </BrowserRouter>
       </ThemeProvider>

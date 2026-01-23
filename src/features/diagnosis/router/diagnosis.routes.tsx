@@ -1,7 +1,10 @@
+import { lazy } from 'react';
 import { Routes, Route } from 'react-router-dom';
-import { DiagnosticWarmupPage } from '@features/diagnosis/pages/DiagnosticWarmupPage';
-import { DiagnosticPlacementPage } from '@features/diagnosis/pages/DiagnosticPlacementPage';
-import { DiagnosticResultsPage } from '@features/diagnosis/pages/DiagnosticResultsPage';
+
+// Lazy load page components
+const DiagnosticWarmupPage = lazy(() => import('@features/diagnosis/pages/DiagnosticWarmupPage').then(m => ({ default: m.DiagnosticWarmupPage })));
+const DiagnosticPlacementPage = lazy(() => import('@features/diagnosis/pages/DiagnosticPlacementPage').then(m => ({ default: m.DiagnosticPlacementPage })));
+const DiagnosticResultsPage = lazy(() => import('@features/diagnosis/pages/DiagnosticResultsPage').then(m => ({ default: m.DiagnosticResultsPage })));
 
 /**
  * Diagnosis feature routes
