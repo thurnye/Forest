@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Box, CardMedia, Typography } from '@mui/material';
 
@@ -10,11 +10,8 @@ import { QuestAccomplishments } from '../components/QuestAccomplishments';
 import achievement from '../../../assets/dashboard/archievement.png';
 import slate from '../../../assets/dashboard/slate.png';
 import { useAppDispatch, useAppSelector } from '@app/hooks/app.hooks';
-// import { logout } from '@features/auth/redux/slices/auth.slice';
-import {
-  fetchProgress,
-  fetchGoals,
-} from '@features/student/redux/slices/student.slice';
+import { logoutAsync } from '@features/auth/redux/slices/auth.asyncThunks';
+import { fetchDashboard } from '@features/student/redux/slices/student.slice';
 import { Student, UserRole } from '@shared/types/api.types';
 
 const woodTextSx = {
@@ -45,27 +42,32 @@ export default function StudentDashboard() {
   const dispatch = useAppDispatch();
   const { user } = useAppSelector((state) => state.auth);
   const student = user?.role === UserRole.STUDENT ? (user as Student) : null;
-  const { progress, goals } = useAppSelector((state) => state.student);
+  const { progress, goals, isLoading } = useAppSelector((state) => state.student);
+  const hasFetched = useRef(false);
 
+  // Check if student needs to take diagnostic
   useEffect(() => {
-    // Check if student needs to take diagnostic
     if (
       student &&
       student.diagnosticEnabled &&
       !student.hasCompletedDiagnostic
     ) {
       navigate('/student/diagnostic/warmup');
-      return;
     }
+  }, [student, navigate]);
 
-    dispatch(fetchProgress());
-    dispatch(fetchGoals());
-  }, [dispatch, student, navigate]);
+  // Fetch dashboard data (progress + goals) in a single request
+  useEffect(() => {
+    if (!hasFetched.current && !isLoading) {
+      hasFetched.current = true;
+      dispatch(fetchDashboard());
+    }
+  }, [dispatch, isLoading]);
 
-  // const handleLogout = () => {
-  //   dispatch(logout());
-  //   navigate('/');
-  // };
+  const handleLogout = async () => {
+    await dispatch(logoutAsync());
+    navigate('/');
+  };
 
   console.log('Student Dashboard rendered', { progress, goals });
 
@@ -82,29 +84,29 @@ export default function StudentDashboard() {
           backgroundPosition: 'center',
         }}
       >
-         <Box
-            onClick={() => navigate('/student/explorer/testingPage')}
-            sx={{
-              position: 'absolute',
-              top: 20,
-              right: 20,
-              cursor: 'pointer',
-              padding: 1,
-              backgroundColor: 'rgba(255, 255, 255, 0.7)',
-              borderRadius: 2,
-              boxShadow: '0 2px 4px rgba(0,0,0,0.3)',
-              transition: 'background-color 0.2s',
-              '&:hover': {
-                backgroundColor: 'rgba(255, 255, 255, 0.9)',
-              },
-               zIndex: 9999
-            }}
-          >
-            <Typography >Testing Page</Typography>
-          </Box>
+        <Box
+          onClick={() => navigate('/student/explorer/testingPage')}
+          sx={{
+            position: 'absolute',
+            top: 20,
+            right: 20,
+            cursor: 'pointer',
+            padding: 1,
+            backgroundColor: 'rgba(255, 255, 255, 0.7)',
+            borderRadius: 2,
+            boxShadow: '0 2px 4px rgba(0,0,0,0.3)',
+            transition: 'background-color 0.2s',
+            '&:hover': {
+              backgroundColor: 'rgba(255, 255, 255, 0.9)',
+            },
+            zIndex: 9999,
+          }}
+        >
+          <Typography>Testing Page</Typography>
+        </Box>
 
           {/* welcome back plaque */}
-        <WelcomePlaque firstName={user?.firstName} />
+        <WelcomePlaque firstName={user?.firstName} onLogout={handleLogout} />
 
         
 

@@ -14,6 +14,7 @@ import {
   IconButton,
   Chip,
   CircularProgress,
+  Alert,
 } from '@mui/material';
 import {
   People as PeopleIcon,
@@ -21,14 +22,14 @@ import {
   Logout as LogoutIcon,
 } from '@mui/icons-material';
 import { useAppDispatch, useAppSelector } from '@app/hooks/app.hooks';
-import { logout } from '@features/auth/redux/slices/auth.slice';
+import { logoutAsync } from '@features/auth/redux/slices/auth.asyncThunks';
 import { fetchStudents } from '../redux/slices/guardian.asyncThunk';
 
 export const ParentTeacherDashboard = () => {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
   const { user } = useAppSelector((state) => state.auth);
-  const { students, isLoading } = useAppSelector(
+  const { students, isLoading, error } = useAppSelector(
     (state) => state.parentTeacher,
   );
 
@@ -36,8 +37,8 @@ export const ParentTeacherDashboard = () => {
     dispatch(fetchStudents());
   }, [dispatch]);
 
-  const handleLogout = () => {
-    dispatch(logout());
+  const handleLogout = async () => {
+    await dispatch(logoutAsync());
     navigate('/');
   };
 
@@ -119,6 +120,12 @@ export const ParentTeacherDashboard = () => {
             Student Overview
           </Typography>
 
+          {error && (
+            <Alert severity='error' sx={{ mb: 2 }}>
+              {error}
+            </Alert>
+          )}
+
           {isLoading ? (
             <Box sx={{ display: 'flex', justifyContent: 'center', p: 3 }}>
               <CircularProgress />
@@ -138,7 +145,7 @@ export const ParentTeacherDashboard = () => {
                         {student.firstName} {student.lastName}
                       </Typography>
                       <Typography variant='body2' color='text.secondary'>
-                        {student.email}
+                        @{student.username || 'No username'}
                       </Typography>
                       {student.readingLevel && (
                         <Chip
@@ -146,6 +153,14 @@ export const ParentTeacherDashboard = () => {
                           size='small'
                           color='primary'
                           sx={{ mt: 1 }}
+                        />
+                      )}
+                      {student.targetGradeLevel && (
+                        <Chip
+                          label={`Target: ${student.targetGradeLevel}`}
+                          size='small'
+                          variant='outlined'
+                          sx={{ mt: 1, ml: 1 }}
                         />
                       )}
                     </CardContent>

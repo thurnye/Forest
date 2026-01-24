@@ -162,6 +162,21 @@ export const fetchGoals = createAsyncThunk(
   }
 );
 
+export const fetchDashboard = createAsyncThunk(
+  'student/fetchDashboard',
+  async (_, { rejectWithValue }) => {
+    try {
+      const response = await studentApiService.getDashboard();
+      if (!response.success) {
+        return rejectWithValue(response.message || 'Failed to fetch dashboard');
+      }
+      return response.data;
+    } catch (error: any) {
+      return rejectWithValue(error.message || 'Failed to fetch dashboard');
+    }
+  }
+);
+
 const studentSlice = createSlice({
   name: 'student',
   initialState,
@@ -271,6 +286,24 @@ const studentSlice = createSlice({
         state.goals = action.payload || [];
       })
       .addCase(fetchGoals.rejected, (state, action) => {
+        state.isLoading = false;
+        state.error = action.payload as string;
+      });
+
+    // Fetch dashboard (combined progress + goals)
+    builder
+      .addCase(fetchDashboard.pending, (state) => {
+        state.isLoading = true;
+        state.error = null;
+      })
+      .addCase(fetchDashboard.fulfilled, (state, action) => {
+        state.isLoading = false;
+        if (action.payload) {
+          state.progress = action.payload.progress;
+          state.goals = action.payload.goals;
+        }
+      })
+      .addCase(fetchDashboard.rejected, (state, action) => {
         state.isLoading = false;
         state.error = action.payload as string;
       });

@@ -29,7 +29,7 @@ export default function StudentSignInPage() {
   } = useForm<LoginFormData>({
     resolver: zodResolver(StudentLoginSchema),
     defaultValues: {
-      username: 'energetic-hornet',
+      username: 'johnd1',
       password: 'Password123',
     },
   });

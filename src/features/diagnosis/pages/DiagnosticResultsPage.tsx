@@ -24,11 +24,11 @@ import { getCurrentUser } from '@/features/auth/redux/slices/auth.asyncThunks';
 // import { getCurrentUser } from '@features/auth/redux/slices/auth.slice';
 
 const strandLabels: Record<SkillStrand, string> = {
-  [SkillStrand.PHONOLOGICAL_AWARENESS]: 'Sound Awareness',
-  [SkillStrand.PHONICS]: 'Letter Sounds',
-  [SkillStrand.VOCABULARY]: 'Words & Meanings',
-  [SkillStrand.COMPREHENSION]: 'Understanding',
-  [SkillStrand.FLUENCY]: 'Reading Smoothly',
+  [SkillStrand.PHONOLOGICAL_AWARENESS]: 'Sound Awareness', // this will be the phonological awareness - ability to recognize and manipulate sounds in spoken words
+  [SkillStrand.PHONICS]: 'Letter Sounds', //this will be the phonics - the sounds of the letters
+  [SkillStrand.VOCABULARY]: 'Words & Meanings', // this will be vocabulary - understanding the meaning of words
+  [SkillStrand.COMPREHENSION]: 'Understanding', // this will be comprehension - understanding the meaning of sentences and passages with questions
+  [SkillStrand.FLUENCY]: 'Reading Smoothly', // this will be fluency - ability to read with speed, accuracy, and proper expression
 };
 
 const skillLevelLabels: Record<SkillLevel, string> = {

@@ -1,6 +1,6 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { User } from '@shared/types/api.types';
-import { bootstrapAuth, getCurrentUser, login, signup } from './auth.asyncThunks';
+import { bootstrapAuth, getCurrentUser, login, signup, logoutAsync } from './auth.asyncThunks';
 
 interface AuthState {
   user: User | null;
@@ -122,6 +122,25 @@ const authSlice = createSlice({
         state.isAuthenticated = false;
         state.user = null;
         // state.token = null;
+      });
+
+    // Logout (async - clears cookies and tokens)
+    builder
+      .addCase(logoutAsync.pending, (state) => {
+        state.isLoading = true;
+      })
+      .addCase(logoutAsync.fulfilled, (state) => {
+        state.isLoading = false;
+        state.user = null;
+        state.isAuthenticated = false;
+        state.error = null;
+      })
+      .addCase(logoutAsync.rejected, (state) => {
+        // Even if logout fails, clear local state
+        state.isLoading = false;
+        state.user = null;
+        state.isAuthenticated = false;
+        state.error = null;
       });
   },
 });

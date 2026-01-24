@@ -82,6 +82,16 @@ interface BackendAssessment {
   completedAt?: string;
 }
 
+interface BackendDashboard {
+  progress: BackendProgress;
+  goals: BackendGoal[];
+}
+
+export interface DashboardData {
+  progress: StudentProgress;
+  goals: Goal[];
+}
+
 // Transform functions
 function transformExercise(backend: BackendExercise): Exercise {
   return {
@@ -161,6 +171,46 @@ class StudentApiService {
    */
   setStudentId(studentId: string): void {
     this.currentStudentId = studentId;
+  }
+
+  /**
+   * Clear the current student ID (on logout)
+   */
+  clearStudentId(): void {
+    this.currentStudentId = null;
+  }
+
+  /**
+   * GET /student/dashboard/:studentId
+   * Get all dashboard data (progress + goals) in a single request
+   */
+  async getDashboard(): Promise<ApiResponse<DashboardData>> {
+    const studentId = this.currentStudentId;
+    if (!studentId) {
+      return {
+        success: false,
+        data: null,
+        message: 'Student ID not set',
+      };
+    }
+
+    const response = await apiClient.get<BackendDashboard>(`/student/dashboard/${studentId}`);
+
+    if (response.success && response.data) {
+      return {
+        success: true,
+        data: {
+          progress: transformProgress(response.data.progress),
+          goals: response.data.goals.map(transformGoal),
+        },
+      };
+    }
+
+    return {
+      success: false,
+      data: null,
+      message: response.message,
+    };
   }
 
   /**

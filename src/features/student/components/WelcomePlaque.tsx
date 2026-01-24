@@ -8,11 +8,13 @@ import flaskIcon from '../../../assets/icons/flask.png';
 interface WelcomePlaqueProps {
   firstName?: string;
   width?: number | string;
+  onLogout?: () => void;
 }
 
 export const WelcomePlaque = ({
   firstName,
   width = '100%',
+  onLogout,
 }: WelcomePlaqueProps) => {
   return (
     <Box
@@ -147,7 +149,7 @@ export const WelcomePlaque = ({
           </g>
           <g
             className='icon-btn'
-            onClick={() => console.log('/student/read-story/exercise-2')}
+            onClick={onLogout}
           >
             <image
               href={flaskIcon}

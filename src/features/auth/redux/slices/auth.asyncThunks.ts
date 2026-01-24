@@ -1,6 +1,7 @@
 import { UserRole } from "@/shared/types/api.types";
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import { authApiService } from "../../services/auth.api.service";
+import { studentApiService } from "@features/student/services/student.api.service";
 
 export const login = createAsyncThunk(
   'auth/login',
@@ -9,7 +10,14 @@ export const login = createAsyncThunk(
     { rejectWithValue }
   ) => {
     try {
-      return await authApiService.login(credentials); // returns LoginResponse
+      const response = await authApiService.login(credentials); // returns LoginResponse
+
+      // Set studentId for student API calls if user is a student
+      if (response.user?.role === 'STUDENT' && response.user?.id) {
+        studentApiService.setStudentId(response.user.id);
+      }
+
+      return response;
     } catch (error: any) {
       return rejectWithValue(error?.message || 'Login failed');
     }
@@ -55,9 +63,48 @@ export const bootstrapAuth = createAsyncThunk(
   async (_, { rejectWithValue }) => {
     try {
       const result = await authApiService.bootstrapAuth();
+
+      // Set studentId for student API calls if user is a student
+      if (result?.user?.role === 'STUDENT' && result?.user?.id) {
+        studentApiService.setStudentId(result.user.id);
+      }
+
       return result; // returns LoginResponse | null
     } catch (error: any) {
       return rejectWithValue(error?.message || 'Session expired');
+    }
+  }
+);
+
+/**
+ * Logout - clears all tokens, cookies, and session data
+ */
+export const logoutAsync = createAsyncThunk(
+  'auth/logout',
+  async (_, { rejectWithValue }) => {
+    try {
+      const userType = authApiService.getUserType();
+
+      // Call the appropriate backend logout endpoint to clear cookies
+      if (userType === 'student') {
+        await authApiService.logoutStudent();
+      } else if (userType === 'guardian') {
+        await authApiService.logoutGuardian();
+      } else {
+        // Fallback: just clear local state
+        await authApiService.logout();
+      }
+
+      // Clear student ID from student API service
+      studentApiService.clearStudentId();
+
+      return null;
+    } catch (error: any) {
+      // Even if backend fails, we still want to clear local state
+      await authApiService.logout();
+      // Clear student ID even on error
+      studentApiService.clearStudentId();
+      return rejectWithValue(error?.message || 'Logout failed');
     }
   }
 );
